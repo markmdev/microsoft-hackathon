@@ -278,7 +278,8 @@ export default function LawyerDashboardPage() {
               instructions="Browse synced police reports, triage new matters, and request follow-up actions."
               labels={{
                 title: "Legal Ops Assistant",
-                initial: "👋 Browse synced police reports, triage new matters, and request follow-up actions.",
+                initial:
+                  "👋 Browse synced police reports, triage new matters, and request follow-up actions.",
               }}
             />
           </div>
@@ -349,7 +350,7 @@ export default function LawyerDashboardPage() {
 
         {/* Right Column: Case Details */}
         <div className="w-96 border-l border-border bg-white/80 backdrop-blur-sm flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6 min-h-0">
+          <div className="flex-1 p-6 min-h-0">
             <CaseDetailPanel
               caseRecord={activeCase}
               onSendEmail={handleSendEmail}
@@ -359,14 +360,14 @@ export default function LawyerDashboardPage() {
             />
           </div>
 
-          <div className="border-t border-border p-6 flex-shrink-0">
+          {/* <div className="border-t border-border p-6 flex-shrink-0">
             <TriagePreferencesForm
               value={viewState.profile.triagePreferences}
               onSave={handleSavePreferences}
               onReset={handleResetPreferences}
               isSaving={isSavingPreferences}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </main>
