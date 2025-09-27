@@ -11,7 +11,12 @@ import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { SummarySection } from "@/components/dashboard/SummarySection";
 import { TriagePreferencesForm } from "@/components/dashboard/TriagePreferencesForm";
 import type { DashboardState, NotificationEntry, TriagePreferences } from "@/lib/dashboard/types";
-import { initialDashboardState } from "@/lib/dashboard/types";
+import { initialDashboardState, initialFeedFilterState } from "@/lib/dashboard/types";
+import {
+  applyFeedFilter,
+  isFeedFilterActive,
+  summarizeFeedFilter,
+} from "@/lib/dashboard/filtering";
 import {
   fetchProfile,
   importCases,
@@ -56,6 +61,17 @@ export default function LawyerDashboardPage() {
   const [dialingIncidentId, setDialingIncidentId] = useState<string | null>(null);
   const hasFetchedProfileRef = useRef(false);
 
+  const feedFilter = viewState.feedFilter ?? initialFeedFilterState;
+
+  const filteredCases = useMemo(
+    () => applyFeedFilter(viewState.cases, feedFilter),
+    [viewState.cases, feedFilter]
+  );
+
+  const filterActive = useMemo(() => isFeedFilterActive(feedFilter), [feedFilter]);
+
+  const filterSummary = useMemo(() => summarizeFeedFilter(feedFilter), [feedFilter]);
+
   const activeCase = useMemo(
     () => viewState.cases.find((entry) => entry.incidentId === viewState.activeCaseId),
     [viewState.cases, viewState.activeCaseId]
@@ -70,6 +86,24 @@ export default function LawyerDashboardPage() {
     },
     [setState]
   );
+
+  const handleClearFeedFilter = useCallback(() => {
+    setState((previous) => {
+      const current = previous || initialDashboardState;
+      const existingFilter = current.feedFilter ?? initialFeedFilterState;
+      if (!isFeedFilterActive(existingFilter)) {
+        return current;
+      }
+
+      return {
+        ...current,
+        feedFilter: { ...initialFeedFilterState },
+        lastAction: "Cleared live feed filter",
+      };
+    });
+    setStatusTone("neutral");
+    setStatusMessage("Live feed filter cleared.");
+  }, [setState]);
 
   const handleDismissNotification = useCallback(
     (notificationId: string) => {
@@ -160,6 +194,23 @@ export default function LawyerDashboardPage() {
 
     void syncProfile();
   }, [setState]);
+
+  useEffect(() => {
+    const action = viewState.lastAction || "";
+    if (!action) {
+      return;
+    }
+
+    if (action.startsWith("Applied live feed filter")) {
+      setStatusTone("success");
+      setStatusMessage(action);
+    }
+
+    if (action === "Cleared live feed filter") {
+      setStatusTone("neutral");
+      setStatusMessage("Live feed filter cleared.");
+    }
+  }, [setStatusMessage, setStatusTone, viewState.lastAction]);
 
   // Auto-import from hardcoded sheet ID when profile is loaded and no cases exist
   useEffect(() => {
@@ -313,11 +364,11 @@ export default function LawyerDashboardPage() {
           <div className="h-full flex flex-col w-full shadow-lg rounded-2xl border border-border overflow-hidden">
             <CopilotChat
               className="flex-1 overflow-auto w-full"
-              instructions="Browse synced police reports, triage new matters, and request follow-up actions."
+              instructions="Browse synced police reports, triage new matters, request follow-up actions, and call the `filter_live_feed_cases` tool when you need to narrow or clear the live feed."
               labels={{
-                title: "Legal Ops Assistant",
+                title: "Ross AI Assistant",
                 initial:
-                  "👋 Browse synced police reports, triage new matters, and request follow-up actions.",
+                  "👋 Welcome to Ross AI! I can help you browse police reports, triage new matters, and coordinate follow-up actions.",
               }}
             />
           </div>
@@ -325,15 +376,14 @@ export default function LawyerDashboardPage() {
 
         {/* Main Column: Primary Content */}
         <div className="flex-1 flex flex-col gap-6 px-8 py-6 overflow-auto">
-          <header className="flex flex-col gap-2 border-b border-border pb-6 relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-lg -mx-4 -my-2"></div>
-            <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent relative z-10">
-              Legal Ops Control Center
-            </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground">
-              Import police report data, monitor live case intake, and coordinate follow-up actions
-              with Copilot assistance.
-            </p>
+          <header className="flex items-center gap-4 border-b border-border pb-6">
+            <div className="flex items-center gap-3">
+              <img src="/Ross logo black.png" alt="Ross AI" className="h-10 w-auto" />
+              <div>
+                <h1 className="text-3xl font-semibold text-foreground">Ross AI</h1>
+                <p className="text-sm text-muted-foreground">Legal Operations Platform</p>
+              </div>
+            </div>
             <div className="text-xs text-muted-foreground">
               {viewState.sheet.sheetId ? (
                 <span>
@@ -370,10 +420,15 @@ export default function LawyerDashboardPage() {
 
             {/* Main content: Live Feed */}
             <CaseFeed
-              cases={viewState.cases}
+              cases={filteredCases}
               queuedCount={viewState.queuedCases.length}
               activeCaseId={viewState.activeCaseId}
               onSelectCase={handleSelectCase}
+              filterSummary={filterActive ? filterSummary : undefined}
+              filteredCount={filteredCases.length}
+              totalCount={viewState.cases.length}
+              isFiltered={filterActive}
+              onClearFilter={filterActive ? handleClearFeedFilter : undefined}
             />
 
             {/* Notifications Panel - full width in main column */}
@@ -393,9 +448,9 @@ export default function LawyerDashboardPage() {
               caseRecord={activeCase}
               onSendEmail={handleSendEmail}
               onTriggerVoiceCall={handleVoiceCall}
-              isVoiceCallPending={
-                Boolean(activeCase && dialingIncidentId === activeCase.incidentId)
-              }
+              isVoiceCallPending={Boolean(
+                activeCase && dialingIncidentId === activeCase.incidentId
+              )}
             />
           </div>
 

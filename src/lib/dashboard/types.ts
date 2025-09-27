@@ -44,6 +44,16 @@ export interface NotificationEntry {
   acknowledged: boolean;
 }
 
+export interface FeedFilterState {
+  summary: string;
+  searchText: string;
+  categories: string[];
+  jurisdictions: string[];
+  injury: boolean | null;
+  propertyDamage: boolean | null;
+  incidentIds: string[];
+}
+
 export interface SheetBinding {
   sheetId: string;
   sheetName?: string;
@@ -61,6 +71,7 @@ export interface DashboardState {
   cases: CaseRecord[];
   queuedCases: CaseRecord[];
   activeCaseId?: string;
+  feedFilter: FeedFilterState;
   profile: LawyerProfile;
   notifications: NotificationEntry[];
   liveFeed: LiveFeedState;
@@ -82,10 +93,21 @@ export const defaultProfile: LawyerProfile = {
   triagePreferences: { ...defaultTriagePreferences },
 };
 
+export const initialFeedFilterState: FeedFilterState = {
+  summary: "",
+  searchText: "",
+  categories: [],
+  jurisdictions: [],
+  injury: null,
+  propertyDamage: null,
+  incidentIds: [],
+};
+
 export const initialDashboardState: DashboardState = {
   cases: [],
   queuedCases: [],
   activeCaseId: undefined,
+  feedFilter: { ...initialFeedFilterState },
   profile: { ...defaultProfile },
   notifications: [],
   liveFeed: {
