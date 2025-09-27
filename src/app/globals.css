@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to Apple-inspired B2B SaaS color palette */
-  --background: #f8fafc; /* Light gray for overall background */
+  /* Updated to Copilot-inspired gradient color palette */
+  --background: linear-gradient(135deg, #f8fafc 0%, #f1f5ff 100%); /* Subtle gradient background */
   --foreground: #374151; /* Dark gray for primary text */
   --card: #ffffff; /* Pure white card background */
   --card-foreground: #374151; /* Dark gray card text */
@@ -38,6 +38,13 @@
   --sidebar-ring: rgba(99, 102, 241, 0.5); /* Sidebar focus ring */
   --font-geist: "Geist", sans-serif;
   --font-manrope: "Manrope", sans-serif;
+
+  /* Copilot-style gradients */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-cool: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
 
 .dark {
@@ -145,6 +152,27 @@ html {
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+}
+
+/* Gradient utility classes */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-secondary {
+  background: var(--gradient-secondary);
+}
+
+.gradient-accent {
+  background: var(--gradient-accent);
+}
+
+.gradient-warm {
+  background: var(--gradient-warm);
+}
+
+.gradient-cool {
+  background: var(--gradient-cool);
 }
 
 .copilotKitMessages {

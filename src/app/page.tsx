@@ -10,7 +10,6 @@ import {
 } from "@/components/dashboard/CaseDetailPanel";
 import { CaseFeed } from "@/components/dashboard/CaseFeed";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
-import { SheetImportForm } from "@/components/dashboard/SheetImportForm";
 import { SummarySection } from "@/components/dashboard/SummarySection";
 import { TriagePreferencesForm } from "@/components/dashboard/TriagePreferencesForm";
 import type {
@@ -27,6 +26,7 @@ import {
   updateTriagePreferences,
 } from "@/lib/dashboard/api";
 import { cn } from "@/lib/utils";
+const HARDCODED_SHEET_ID = "1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk";
 
 function mergeNotifications(
   existing: NotificationEntry[],
@@ -67,33 +67,11 @@ export default function LawyerDashboardPage() {
     [viewState.cases, viewState.activeCaseId],
   );
 
-  useEffect(() => {
-    if (hasFetchedProfileRef.current) {
-      return;
-    }
-    hasFetchedProfileRef.current = true;
-
-    const syncProfile = async () => {
-      try {
-        const response = await fetchProfile();
-        if (response?.profile) {
-          setState((previous) => ({
-            ...previous,
-            profile: response.profile,
-          }));
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile", error);
-      }
-    };
-
-    void syncProfile();
-  }, [setState]);
 
   const handleSelectCase = useCallback(
     (incidentId: string) => {
       setState((previous) => ({
-        ...previous,
+        ...(previous || initialDashboardState),
         activeCaseId: incidentId,
       }));
     },
@@ -102,16 +80,19 @@ export default function LawyerDashboardPage() {
 
   const handleDismissNotification = useCallback(
     (notificationId: string) => {
-      setState((previous) => ({
-        ...previous,
-        notifications: previous.notifications
-          .map((notification) =>
-            notification.id === notificationId
-              ? { ...notification, acknowledged: true }
-              : notification,
-          )
-          .filter((notification) => notification.id !== notificationId),
-      }));
+      setState((previous) => {
+        const current = previous || initialDashboardState;
+        return {
+          ...current,
+          notifications: current.notifications
+            .map((notification) =>
+              notification.id === notificationId
+                ? { ...notification, acknowledged: true }
+                : notification,
+            )
+            .filter((notification) => notification.id !== notificationId),
+        };
+      });
     },
     [setState],
   );
@@ -128,25 +109,28 @@ export default function LawyerDashboardPage() {
           visibleCaseLimit: Math.max(viewState.liveFeed.nextCaseIndex, 4),
         });
 
-        setState((previous) => ({
-          ...previous,
-          cases: response.cases,
-          queuedCases: response.queuedCases,
-          activeCaseId: response.cases[0]?.incidentId ?? previous.activeCaseId,
-          profile: response.profile,
-          sheet: {
-            sheetId: response.sheet.sheetId,
-            sheetName: response.sheet.sheetName,
-            lastSyncedAt: response.sheet.lastSyncedAt,
-          },
-          notifications: mergeNotifications(previous.notifications, response.notifications),
-          metrics: response.metrics,
-          liveFeed: {
-            ...previous.liveFeed,
-            nextCaseIndex: response.cases.length,
-          },
-          lastAction: `Imported ${response.totalCases} cases from Google Sheets`,
-        }));
+        setState((previous) => {
+          const current = previous || initialDashboardState;
+          return {
+            ...current,
+            cases: response.cases,
+            queuedCases: response.queuedCases,
+            activeCaseId: response.cases[0]?.incidentId ?? current.activeCaseId,
+            profile: response.profile,
+            sheet: {
+              sheetId: response.sheet.sheetId,
+              sheetName: response.sheet.sheetName,
+              lastSyncedAt: response.sheet.lastSyncedAt,
+            },
+            notifications: mergeNotifications(current.notifications, response.notifications),
+            metrics: response.metrics,
+            liveFeed: {
+              ...current.liveFeed,
+              nextCaseIndex: response.cases.length,
+            },
+            lastAction: `Imported ${response.totalCases} cases from Google Sheets`,
+          };
+        });
 
         setStatusTone("success");
         setStatusMessage(`Imported ${response.totalCases} cases from Google Sheets.`);
@@ -160,6 +144,40 @@ export default function LawyerDashboardPage() {
     },
     [setState, viewState.liveFeed.nextCaseIndex, viewState.profile.triagePreferences],
   );
+
+  useEffect(() => {
+    if (hasFetchedProfileRef.current) {
+      return;
+    }
+    hasFetchedProfileRef.current = true;
+
+    const syncProfile = async () => {
+      try {
+        const response = await fetchProfile();
+        if (response?.profile) {
+          setState((previous) => ({
+            ...(previous || initialDashboardState),
+            profile: response.profile,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+      }
+    };
+
+    void syncProfile();
+  }, [setState]);
+
+  // Auto-import from hardcoded sheet ID when profile is loaded and no cases exist
+  useEffect(() => {
+    if (viewState.profile.displayName && viewState.cases.length === 0 && !isImporting) {
+      handleImportCases({
+        sheetId: HARDCODED_SHEET_ID,
+      }).catch(error => {
+        console.error("Failed to auto-import cases", error);
+      });
+    }
+  }, [viewState.profile.displayName, viewState.cases.length, isImporting, handleImportCases]);
 
   const handleListSheets = useCallback(async (sheetId: string) => {
     const response = await fetch("/api/sheets/list", {
@@ -183,14 +201,17 @@ export default function LawyerDashboardPage() {
       try {
         await updateTriagePreferences({ preferences });
 
-        setState((previous) => ({
-          ...previous,
-          profile: {
-            ...previous.profile,
-            triagePreferences: preferences,
-          },
-          lastAction: "Updated triage preferences",
-        }));
+        setState((previous) => {
+          const current = previous || initialDashboardState;
+          return {
+            ...current,
+            profile: {
+              ...current.profile,
+              triagePreferences: preferences,
+            },
+            lastAction: "Updated triage preferences",
+          };
+        });
 
         setStatusTone("success");
         setStatusMessage("Triage preferences saved.");
@@ -216,7 +237,7 @@ export default function LawyerDashboardPage() {
     try {
       const profileResponse = await fetchProfile();
       setState((previous) => ({
-        ...previous,
+        ...(previous || initialDashboardState),
         profile: profileResponse.profile,
       }));
       setStatusTone("neutral");
@@ -226,7 +247,7 @@ export default function LawyerDashboardPage() {
       setStatusTone("error");
       setStatusMessage("Failed to reset preferences.");
     }
-  }, [setState]);
+  }, [setState, handleImportCases]);
 
   const handleSendEmail = useCallback((caseRecord: NonNullable<typeof activeCase>) => {
     console.log("Trigger email via Resend", caseRecord);
@@ -240,21 +261,22 @@ export default function LawyerDashboardPage() {
 
     const interval = setInterval(() => {
       setState((previous) => {
-        if (!previous.liveFeed.enabled || previous.queuedCases.length === 0) {
-          return previous;
+        const current = previous || initialDashboardState;
+        if (!current.liveFeed.enabled || current.queuedCases.length === 0) {
+          return current;
         }
 
-        const [nextCase, ...remainingQueue] = previous.queuedCases;
-        const nextCases = [nextCase, ...previous.cases];
+        const [nextCase, ...remainingQueue] = current.queuedCases;
+        const nextCases = [nextCase, ...current.cases];
 
         return {
-          ...previous,
+          ...current,
           cases: nextCases,
           queuedCases: remainingQueue,
-          activeCaseId: previous.activeCaseId ?? nextCase.incidentId,
+          activeCaseId: current.activeCaseId ?? nextCase.incidentId,
           liveFeed: {
-            ...previous.liveFeed,
-            nextCaseIndex: previous.liveFeed.nextCaseIndex + 1,
+            ...current.liveFeed,
+            nextCaseIndex: current.liveFeed.nextCaseIndex + 1,
           },
           lastAction: `Live feed received case ${nextCase.incidentId}`,
         };
@@ -265,17 +287,17 @@ export default function LawyerDashboardPage() {
   }, [setState, viewState.liveFeed.enabled, viewState.liveFeed.intervalMs, viewState.queuedCases.length]);
 
   return (
-    <main className="relative min-h-screen bg-background text-foreground">
+    <main className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-foreground">
       <CopilotSidebar
         defaultOpen
-        hitEscapeToClose
         className="z-40"
         instructions="Browse synced police reports, triage new matters, and request follow-up actions."
       />
 
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 lg:pr-80">
-        <header className="flex flex-col gap-2 border-b border-border pb-6">
-          <h1 className="text-3xl font-semibold">Legal Ops Control Center</h1>
+        <header className="flex flex-col gap-2 border-b border-border pb-6 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-lg -mx-4 -my-2"></div>
+          <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent relative z-10">Legal Ops Control Center</h1>
           <p className="max-w-2xl text-sm text-muted-foreground">
             Import police report data, monitor live case intake, and coordinate follow-up actions with Copilot assistance.
           </p>
@@ -305,15 +327,8 @@ export default function LawyerDashboardPage() {
         </header>
 
         <div className="grid gap-6">
-          <SheetImportForm
-            sheetId={viewState.sheet.sheetId}
-            sheetName={viewState.sheet.sheetName}
-            isImporting={isImporting}
-            onImport={handleImportCases}
-            onListSheets={handleListSheets}
-          />
 
-          <SummarySection metrics={viewState.metrics} sheet={viewState.sheet} />
+          <SummarySection metrics={viewState.metrics} sheet={viewState.sheet} cases={viewState.cases} />
 
           <div className="grid gap-6 lg:grid-cols-[2fr_1.1fr]">
             <CaseFeed
