@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 import type { CaseRecord } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
@@ -10,8 +11,8 @@ interface CaseFeedProps {
   onSelectCase: (incidentId: string) => void;
 }
 
-const baseCardStyles =
-  "flex cursor-pointer flex-col gap-2 rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md";
+const baseListItemStyles =
+  "flex cursor-pointer items-center gap-4 rounded-lg border border-border bg-gradient-to-r from-white via-white to-slate-50/50 p-4 transition-all duration-200 hover:from-blue-50/50 hover:to-purple-50/50 hover:shadow-md";
 
 export function CaseFeed({ cases, queuedCount, activeCaseId, onSelectCase }: CaseFeedProps) {
   return (
@@ -23,55 +24,68 @@ export function CaseFeed({ cases, queuedCount, activeCaseId, onSelectCase }: Cas
             New reports appear automatically. Click to inspect full details.
           </p>
         </div>
-        <div className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-          {queuedCount > 0 ? `${queuedCount} awaiting processing` : "Fully synced"}
+        <div className="rounded-full bg-gradient-to-r from-emerald-100 to-green-100 px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm">
+          {queuedCount > 0 ? `${queuedCount} more incoming` : "Live feed active"}
         </div>
       </header>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {cases.map((caseRecord) => {
-          const isActive = caseRecord.incidentId === activeCaseId;
-          return (
-            <article
-              key={caseRecord.incidentId}
-              className={cn(
-                baseCardStyles,
-                isActive && "border-primary bg-primary/5 shadow-lg",
-              )}
-              onClick={() => onSelectCase(caseRecord.incidentId)}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {caseRecord.incidentId}
-                  </p>
-                  <h3 className="text-lg font-semibold">{caseRecord.incidentCategory}</h3>
-                </div>
+      <div className="h-[600px] overflow-y-auto space-y-3">
+        <AnimatePresence mode="popLayout">
+          {cases.map((caseRecord) => {
+            const isActive = caseRecord.incidentId === activeCaseId;
+            return (
+              <motion.article
+                key={caseRecord.incidentId}
+                layout
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 24,
+                  duration: 0.3
+                }}
+                className={cn(
+                  baseListItemStyles,
+                  isActive && "border-purple-400 bg-gradient-to-r from-purple-50 to-blue-50 shadow-lg ring-1 ring-purple-200",
+                )}
+                onClick={() => onSelectCase(caseRecord.incidentId)}
+              >
+              <div className="flex-shrink-0 w-24">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {caseRecord.incidentId}
+                </p>
                 <span className="rounded bg-secondary px-2 py-1 text-xs text-secondary-foreground">
                   {caseRecord.jurisdiction}
                 </span>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                {caseRecord.location} • {caseRecord.incidentDate} at {caseRecord.incidentTime}
-              </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-lg font-semibold truncate">{caseRecord.incidentCategory}</h3>
+                  <div className="flex items-center gap-2 text-xs flex-shrink-0">
+                    <Badge intent={caseRecord.injuryReported ? "critical" : "neutral"}>
+                      {caseRecord.injuryReported ? "Injury" : "No injury"}
+                    </Badge>
+                    <Badge intent={caseRecord.propertyDamage ? "warning" : "neutral"}>
+                      {caseRecord.propertyDamage ? "Damage" : "No damage"}
+                    </Badge>
+                  </div>
+                </div>
 
-              <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Badge intent={caseRecord.injuryReported ? "critical" : "neutral"}>
-                  {caseRecord.injuryReported ? "Injury reported" : "No injury reported"}
-                </Badge>
-                <Badge intent={caseRecord.propertyDamage ? "warning" : "neutral"}>
-                  {caseRecord.propertyDamage ? "Property damage" : "No property damage"}
-                </Badge>
-                <Badge intent="outline">Fault: {caseRecord.faultDetermination || "Pending"}</Badge>
+                <p className="text-sm text-muted-foreground truncate">
+                  {caseRecord.location} • {caseRecord.incidentDate} at {caseRecord.incidentTime}
+                </p>
+
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                  {caseRecord.incidentDescription}
+                </p>
               </div>
-
-              <p className="line-clamp-3 text-sm text-muted-foreground">
-                {caseRecord.incidentDescription}
-              </p>
-            </article>
-          );
-        })}
+              </motion.article>
+            );
+          })}
+        </AnimatePresence>
         {cases.length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
             Import a Google Sheet to populate the live feed.
