@@ -8,7 +8,7 @@ Hackathon legal ops copilot built on Next.js + CopilotKit + LlamaIndex. The dash
 - **Agent Runtime**: Python FastAPI + LlamaIndex (`agent/agent/agent.py`)
 - **Data Source**: Google Sheets via Composio MCP (read-only for now)
 - **Notifications**: In-memory triage evaluation (server) + UI toasts/banners
-- **Comms hooks**: Resend (emails) wired in UI; outbound voice button is a stub for teammate integration
+- **Comms hooks**: Resend (emails) placeholder; outbound voice call triggers Vapi assistant via FastAPI proxy
 
 ## Data Source & Schema
 
@@ -35,21 +35,31 @@ fault_determination, incident_description
   - `POST /sheets/sync`: ingest sheet + return dashboard payload
   - `POST /sheets/list`: enumerate tab names
   - `GET /profile`, `POST /profile/triage`: load/update backend triage profile
-- **Next.js dashboard** (`src/app/page.tsx`) now renders modular sections: sheet import controls, summary metrics, live case feed, case detail panel, triage preferences form, notifications, and Copilot chat.
+- **Next.js dashboard** (`src/app/page.tsx`) now renders modular sections: gradient summary metrics, live feed list with streaming animation, case detail panel, triage preferences form, notifications, and a persistent Copilot chat rail.
 - **Simulation**: queued cases surface into the live feed every 5 seconds (configurable via shared state).
 
 ## Usage Notes
 
-1. Populate Google Sheet with the schema above and copy the sheet ID (from URL) + optional tab name.
-2. Use the "Google Sheets Connection" form to import. First import exposes the first N cases immediately (default 4) and stages the remainder for the live ticker.
+1. Populate the shared Google Sheet (ID `1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk`) with the schema above.
+2. The dashboard auto-syncs on load; the first six rows display instantly and the rest stream in to mimic real-time ingestion.
 3. Update triage preferences (categories, jurisdictions, injury/property toggles) from the profile panel. Saving persists to the backend profile store and re-runs triage evaluation against the sheet.
 4. Notifications banner surfaces incidents matching the profile. Dismissing removes them locally while keeping history server-side for re-imports.
-5. "Voice Call" button is UI-only; teammate will connect to outbound dialer. "Send Email" triggers a Resend hook placeholder—wire actual API call next.
+5. "Voice Call" dials the selected prospect through Vapi using your configured assistant. "Send Email" remains a placeholder hook for Resend integration.
+
+### Voice Call Configuration
+
+Before placing calls set the following environment variables (repo or agent `.env` files):
+
+- `VAPI_API_KEY` – provided key for authenticating server-side requests
+- `VAPI_ASSISTANT_ID` – identifier of the Vapi assistant that should handle calls
+- `VAPI_PHONE_NUMBER_ID` (optional) – specific Vapi phone number ID to originate calls
+- `VAPI_PHONE_NUMBER` (optional) – fallback outbound caller number if you don't have an ID
+- `VAPI_TARGET_PHONE_NUMBER` (optional) – override destination; defaults to `+19195196442`
+- `VAPI_API_BASE_URL` (optional) – override for non-default Vapi endpoints
 
 ## Next Steps / Open Items
 
 - Connect Resend API & email templates for real outreach.
-- Integrate outbound voice service once teammate exposes invocation endpoint.
 - Expand case workflow (status columns, follow-up tasks, notes) if time allows.
 - Add chart visualizations for `metrics.casesByCategory` (bar chart) and injury trends.
 - Persist triage/profile + notifications to durable store (Redis/Postgres) if session reset becomes an issue.

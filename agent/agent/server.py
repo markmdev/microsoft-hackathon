@@ -34,6 +34,11 @@ _load_env_files()
 from .agent import agentic_chat_router
 from .profile import get_profile, update_triage_preferences
 from .sheets_integration import get_sheet_names, import_cases_from_sheet
+from .voice_calls import (
+    VoiceCallConfigurationError,
+    VoiceCallRequestError,
+    start_voice_call,
+)
 
 app = FastAPI()
 app.include_router(agentic_chat_router)
@@ -61,6 +66,16 @@ class SheetSyncRequest(BaseModel):
 class TriageUpdateRequest(BaseModel):
     profile_id: str = Field(default="default", alias="profile_id")
     preferences: TriagePreferencesModel
+
+    class Config:
+        populate_by_name = True
+
+
+class VoiceCallRequestModel(BaseModel):
+    incident_id: str = Field(alias="incidentId")
+    full_name: str = Field(alias="fullName")
+    phone_number: str = Field(alias="phoneNumber")
+    incident_summary: Optional[str] = Field(default=None, alias="incidentSummary")
 
     class Config:
         populate_by_name = True
@@ -150,3 +165,24 @@ async def update_triage(request: TriageUpdateRequest):
         )
     except Exception as exc:  # pragma: no cover - defensive logging
         raise HTTPException(status_code=500, detail=f"Failed to update triage preferences: {exc}")
+
+
+@app.post("/voice/call")
+async def initiate_voice_call(request: VoiceCallRequestModel):
+    """Kick off a Vapi outbound call for the selected case."""
+
+    try:
+        result = await start_voice_call(
+            incident_id=request.incident_id,
+            full_name=request.full_name,
+            phone_number=request.phone_number,
+            incident_summary=request.incident_summary,
+        )
+        return JSONResponse(content=result)
+    except VoiceCallRequestError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except VoiceCallConfigurationError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except Exception as exc:  # pragma: no cover - defensive logging
+        print(f"Voice call error: {exc}")
+        raise HTTPException(status_code=500, detail="Failed to initiate voice call.")

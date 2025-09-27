@@ -10,18 +10,19 @@ import { CaseFeed } from "@/components/dashboard/CaseFeed";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { SummarySection } from "@/components/dashboard/SummarySection";
 import { TriagePreferencesForm } from "@/components/dashboard/TriagePreferencesForm";
-import type {
-  DashboardState,
-  NotificationEntry,
-  TriagePreferences,
-} from "@/lib/dashboard/types";
+import type { DashboardState, NotificationEntry, TriagePreferences } from "@/lib/dashboard/types";
 import { initialDashboardState, initialFeedFilterState } from "@/lib/dashboard/types";
 import {
   applyFeedFilter,
   isFeedFilterActive,
   summarizeFeedFilter,
 } from "@/lib/dashboard/filtering";
-import { fetchProfile, importCases, updateTriagePreferences } from "@/lib/dashboard/api";
+import {
+  fetchProfile,
+  importCases,
+  triggerVoiceCall,
+  updateTriagePreferences,
+} from "@/lib/dashboard/api";
 import { cn } from "@/lib/utils";
 const HARDCODED_SHEET_ID = "1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk";
 
@@ -57,6 +58,7 @@ export default function LawyerDashboardPage() {
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<"neutral" | "success" | "error">("neutral");
+  const [dialingIncidentId, setDialingIncidentId] = useState<string | null>(null);
   const hasFetchedProfileRef = useRef(false);
 
   const feedFilter = viewState.feedFilter ?? initialFeedFilterState;
@@ -285,6 +287,38 @@ export default function LawyerDashboardPage() {
     [setStatusMessage, setStatusTone]
   );
 
+  const handleVoiceCall = useCallback(
+    async (caseRecord: NonNullable<typeof activeCase>) => {
+      if (!caseRecord.phoneNumber?.trim()) {
+        setStatusTone("error");
+        setStatusMessage(`No phone number available for ${caseRecord.fullName}.`);
+        return;
+      }
+
+      setDialingIncidentId(caseRecord.incidentId);
+      setStatusMessage(null);
+
+      try {
+        const response = await triggerVoiceCall({
+          incidentId: caseRecord.incidentId,
+          fullName: caseRecord.fullName,
+          phoneNumber: caseRecord.phoneNumber,
+          incidentSummary: caseRecord.incidentDescription,
+        });
+
+        setStatusTone("success");
+        setStatusMessage(response.message ?? `Dialing ${caseRecord.phoneNumber}`);
+      } catch (error) {
+        console.error("Voice call error", error);
+        setStatusTone("error");
+        setStatusMessage(`Failed to start call to ${caseRecord.fullName}.`);
+      } finally {
+        setDialingIncidentId(null);
+      }
+    },
+    [setDialingIncidentId, setStatusMessage, setStatusTone, triggerVoiceCall]
+  );
+
   useEffect(() => {
     if (!viewState.liveFeed.enabled) return;
     if (viewState.queuedCases.length === 0) return;
@@ -333,7 +367,8 @@ export default function LawyerDashboardPage() {
               instructions="Browse synced police reports, triage new matters, request follow-up actions, and call the `filter_live_feed_cases` tool when you need to narrow or clear the live feed."
               labels={{
                 title: "Ross AI Assistant",
-                initial: "👋 Welcome to Ross AI! I can help you browse police reports, triage new matters, and coordinate follow-up actions.",
+                initial:
+                  "👋 Welcome to Ross AI! I can help you browse police reports, triage new matters, and coordinate follow-up actions.",
               }}
             />
           </div>
@@ -343,18 +378,10 @@ export default function LawyerDashboardPage() {
         <div className="flex-1 flex flex-col gap-6 px-8 py-6 overflow-auto">
           <header className="flex items-center gap-4 border-b border-border pb-6">
             <div className="flex items-center gap-3">
-              <img
-                src="/Ross logo black.png"
-                alt="Ross AI"
-                className="h-10 w-auto"
-              />
+              <img src="/Ross logo black.png" alt="Ross AI" className="h-10 w-auto" />
               <div>
-                <h1 className="text-3xl font-semibold text-foreground">
-                  Ross AI
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Legal Operations Platform
-                </p>
+                <h1 className="text-3xl font-semibold text-foreground">Ross AI</h1>
+                <p className="text-sm text-muted-foreground">Legal Operations Platform</p>
               </div>
             </div>
             <div className="text-xs text-muted-foreground">
@@ -416,24 +443,25 @@ export default function LawyerDashboardPage() {
 
         {/* Right Column: Case Details */}
         <div className="w-96 border-l border-border bg-white/80 backdrop-blur-sm flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6 min-h-0">
+          <div className="flex-1 p-6 min-h-0">
             <CaseDetailPanel
               caseRecord={activeCase}
               onSendEmail={handleSendEmail}
-              onTriggerVoiceCall={(record) =>
-                console.log("Voice call integration placeholder", record)
-              }
+              onTriggerVoiceCall={handleVoiceCall}
+              isVoiceCallPending={Boolean(
+                activeCase && dialingIncidentId === activeCase.incidentId
+              )}
             />
           </div>
 
-          <div className="border-t border-border p-6 flex-shrink-0">
+          {/* <div className="border-t border-border p-6 flex-shrink-0">
             <TriagePreferencesForm
               value={viewState.profile.triagePreferences}
               onSave={handleSavePreferences}
               onReset={handleResetPreferences}
               isSaving={isSavingPreferences}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </main>
