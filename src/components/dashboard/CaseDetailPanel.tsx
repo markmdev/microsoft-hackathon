@@ -14,7 +14,7 @@ export function CaseDetailPanel({
 }: CaseDetailPanelProps) {
   if (!caseRecord) {
     return (
-      <section className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+      <section className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground min-h-64">
         Select a case from the feed to review full details.
       </section>
     );
@@ -24,7 +24,7 @@ export function CaseDetailPanel({
   const damageText = caseRecord.propertyDamage ? "Yes" : "No";
 
   return (
-    <section className="flex h-full flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
+    <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
       <header className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{caseRecord.incidentId}</p>

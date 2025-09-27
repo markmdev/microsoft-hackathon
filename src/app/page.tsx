@@ -5,32 +5,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCoAgent } from "@copilotkit/react-core";
 import { CopilotSidebar } from "@copilotkit/react-ui";
 
-import {
-  CaseDetailPanel,
-} from "@/components/dashboard/CaseDetailPanel";
+import { CaseDetailPanel } from "@/components/dashboard/CaseDetailPanel";
 import { CaseFeed } from "@/components/dashboard/CaseFeed";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { SummarySection } from "@/components/dashboard/SummarySection";
 import { TriagePreferencesForm } from "@/components/dashboard/TriagePreferencesForm";
-import type {
-  DashboardState,
-  NotificationEntry,
-  TriagePreferences,
-} from "@/lib/dashboard/types";
-import {
-  initialDashboardState,
-} from "@/lib/dashboard/types";
-import {
-  fetchProfile,
-  importCases,
-  updateTriagePreferences,
-} from "@/lib/dashboard/api";
+import type { DashboardState, NotificationEntry, TriagePreferences } from "@/lib/dashboard/types";
+import { initialDashboardState } from "@/lib/dashboard/types";
+import { fetchProfile, importCases, updateTriagePreferences } from "@/lib/dashboard/api";
 import { cn } from "@/lib/utils";
 const HARDCODED_SHEET_ID = "1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk";
 
 function mergeNotifications(
   existing: NotificationEntry[],
-  incoming: NotificationEntry[],
+  incoming: NotificationEntry[]
 ): NotificationEntry[] {
   const map = new Map(existing.map((item) => [item.id, item]));
 
@@ -43,8 +31,8 @@ function mergeNotifications(
     }
   });
 
-  return Array.from(map.values()).sort((a, b) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
 
@@ -64,9 +52,8 @@ export default function LawyerDashboardPage() {
 
   const activeCase = useMemo(
     () => viewState.cases.find((entry) => entry.incidentId === viewState.activeCaseId),
-    [viewState.cases, viewState.activeCaseId],
+    [viewState.cases, viewState.activeCaseId]
   );
-
 
   const handleSelectCase = useCallback(
     (incidentId: string) => {
@@ -75,7 +62,7 @@ export default function LawyerDashboardPage() {
         activeCaseId: incidentId,
       }));
     },
-    [setState],
+    [setState]
   );
 
   const handleDismissNotification = useCallback(
@@ -88,13 +75,13 @@ export default function LawyerDashboardPage() {
             .map((notification) =>
               notification.id === notificationId
                 ? { ...notification, acknowledged: true }
-                : notification,
+                : notification
             )
             .filter((notification) => notification.id !== notificationId),
         };
       });
     },
-    [setState],
+    [setState]
   );
 
   const handleImportCases = useCallback(
@@ -142,7 +129,7 @@ export default function LawyerDashboardPage() {
         setIsImporting(false);
       }
     },
-    [setState, viewState.liveFeed.nextCaseIndex, viewState.profile.triagePreferences],
+    [setState, viewState.liveFeed.nextCaseIndex, viewState.profile.triagePreferences]
   );
 
   useEffect(() => {
@@ -173,26 +160,11 @@ export default function LawyerDashboardPage() {
     if (viewState.profile.displayName && viewState.cases.length === 0 && !isImporting) {
       handleImportCases({
         sheetId: HARDCODED_SHEET_ID,
-      }).catch(error => {
+      }).catch((error) => {
         console.error("Failed to auto-import cases", error);
       });
     }
   }, [viewState.profile.displayName, viewState.cases.length, isImporting, handleImportCases]);
-
-  const handleListSheets = useCallback(async (sheetId: string) => {
-    const response = await fetch("/api/sheets/list", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheetId }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to list sheets");
-    }
-
-    const result = await response.json();
-    return (result.sheetNames ?? result.sheet_names ?? []) as string[];
-  }, []);
 
   const handleSavePreferences = useCallback(
     async (preferences: TriagePreferences) => {
@@ -230,7 +202,7 @@ export default function LawyerDashboardPage() {
         setIsSavingPreferences(false);
       }
     },
-    [handleImportCases, setState, viewState.sheet.sheetId, viewState.sheet.sheetName],
+    [handleImportCases, setState, viewState.sheet.sheetId, viewState.sheet.sheetName]
   );
 
   const handleResetPreferences = useCallback(async () => {
@@ -247,13 +219,16 @@ export default function LawyerDashboardPage() {
       setStatusTone("error");
       setStatusMessage("Failed to reset preferences.");
     }
-  }, [setState, handleImportCases]);
+  }, [setState]);
 
-  const handleSendEmail = useCallback((caseRecord: NonNullable<typeof activeCase>) => {
-    console.log("Trigger email via Resend", caseRecord);
-    setStatusTone("neutral");
-    setStatusMessage(`Prepared email payload for ${caseRecord.fullName}.`);
-  }, [setStatusMessage, setStatusTone]);
+  const handleSendEmail = useCallback(
+    (caseRecord: NonNullable<typeof activeCase>) => {
+      console.log("Trigger email via Resend", caseRecord);
+      setStatusTone("neutral");
+      setStatusMessage(`Prepared email payload for ${caseRecord.fullName}.`);
+    },
+    [setStatusMessage, setStatusTone]
+  );
 
   useEffect(() => {
     if (!viewState.liveFeed.enabled) return;
@@ -284,59 +259,92 @@ export default function LawyerDashboardPage() {
     }, viewState.liveFeed.intervalMs);
 
     return () => clearInterval(interval);
-  }, [setState, viewState.liveFeed.enabled, viewState.liveFeed.intervalMs, viewState.queuedCases.length]);
+  }, [
+    setState,
+    viewState.liveFeed.enabled,
+    viewState.liveFeed.intervalMs,
+    viewState.queuedCases.length,
+  ]);
 
   return (
     <main className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-foreground">
-      <CopilotSidebar
-        defaultOpen
-        className="z-40"
-        instructions="Browse synced police reports, triage new matters, and request follow-up actions."
-      />
+      {/* 3-Column Layout: Chat | Main Content | Case Details */}
+      <div className="flex h-screen">
+        {/* Left Column: Chat */}
+        <div className="w-80 border-r border-border bg-white/80 backdrop-blur-sm overflow-hidden">
+          <CopilotSidebar
+            defaultOpen
+            className="w-full h-full border-none shadow-none"
+            instructions="Browse synced police reports, triage new matters, and request follow-up actions."
+          />
+        </div>
 
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 lg:pr-80">
-        <header className="flex flex-col gap-2 border-b border-border pb-6 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-lg -mx-4 -my-2"></div>
-          <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent relative z-10">Legal Ops Control Center</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            Import police report data, monitor live case intake, and coordinate follow-up actions with Copilot assistance.
-          </p>
-          <div className="text-xs text-muted-foreground">
-            {viewState.sheet.sheetId ? (
-              <span>
-                Connected to sheet <span className="font-medium">{viewState.sheet.sheetId}</span>
-                {viewState.sheet.sheetName ? ` • tab ${viewState.sheet.sheetName}` : ""}
-                {viewState.sheet.lastSyncedAt ? ` • synced ${new Date(viewState.sheet.lastSyncedAt).toLocaleTimeString()}` : ""}
-              </span>
-            ) : (
-              <span>No sheet connected yet.</span>
-            )}
-          </div>
-          {statusMessage && (
-            <div
-              className={cn(
-                "mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-xs",
-                statusTone === "success" && "bg-emerald-100 text-emerald-700",
-                statusTone === "error" && "bg-red-100 text-red-700",
-                statusTone === "neutral" && "bg-muted text-muted-foreground",
+        {/* Main Column: Primary Content */}
+        <div className="flex-1 flex flex-col gap-6 px-8 py-6 overflow-auto">
+          <header className="flex flex-col gap-2 border-b border-border pb-6 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-lg -mx-4 -my-2"></div>
+            <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent relative z-10">
+              Legal Ops Control Center
+            </h1>
+            <p className="max-w-2xl text-sm text-muted-foreground">
+              Import police report data, monitor live case intake, and coordinate follow-up actions
+              with Copilot assistance.
+            </p>
+            <div className="text-xs text-muted-foreground">
+              {viewState.sheet.sheetId ? (
+                <span>
+                  Connected to sheet <span className="font-medium">{viewState.sheet.sheetId}</span>
+                  {viewState.sheet.sheetName ? ` • tab ${viewState.sheet.sheetName}` : ""}
+                  {viewState.sheet.lastSyncedAt
+                    ? ` • synced ${new Date(viewState.sheet.lastSyncedAt).toLocaleTimeString()}`
+                    : ""}
+                </span>
+              ) : (
+                <span>No sheet connected yet.</span>
               )}
-            >
-              {statusMessage}
             </div>
-          )}
-        </header>
+            {statusMessage && (
+              <div
+                className={cn(
+                  "mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-xs",
+                  statusTone === "success" && "bg-emerald-100 text-emerald-700",
+                  statusTone === "error" && "bg-red-100 text-red-700",
+                  statusTone === "neutral" && "bg-muted text-muted-foreground"
+                )}
+              >
+                {statusMessage}
+              </div>
+            )}
+          </header>
 
-        <div className="grid gap-6">
+          <div className="grid gap-6">
+            <SummarySection
+              metrics={viewState.metrics}
+              sheet={viewState.sheet}
+              cases={viewState.cases}
+            />
 
-          <SummarySection metrics={viewState.metrics} sheet={viewState.sheet} cases={viewState.cases} />
-
-          <div className="grid gap-6 lg:grid-cols-[2fr_1.1fr]">
+            {/* Main content: Live Feed */}
             <CaseFeed
               cases={viewState.cases}
               queuedCount={viewState.queuedCases.length}
               activeCaseId={viewState.activeCaseId}
               onSelectCase={handleSelectCase}
             />
+
+            {/* Notifications Panel - full width in main column */}
+            <div className="h-96">
+              <NotificationsPanel
+                notifications={viewState.notifications}
+                onDismiss={handleDismissNotification}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Case Details */}
+        <div className="w-96 border-l border-border bg-white/80 backdrop-blur-sm flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-6 min-h-0">
             <CaseDetailPanel
               caseRecord={activeCase}
               onSendEmail={handleSendEmail}
@@ -346,11 +354,7 @@ export default function LawyerDashboardPage() {
             />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <NotificationsPanel
-              notifications={viewState.notifications}
-              onDismiss={handleDismissNotification}
-            />
+          <div className="border-t border-border p-6 flex-shrink-0">
             <TriagePreferencesForm
               value={viewState.profile.triagePreferences}
               onSave={handleSavePreferences}
