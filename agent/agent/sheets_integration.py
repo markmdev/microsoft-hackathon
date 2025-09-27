@@ -315,7 +315,7 @@ def import_cases_from_sheet(
     sheet_id: str,
     sheet_name: Optional[str] = None,
     *,
-    visible_case_limit: int = 3,
+    visible_case_limit: int = 97,
     triage_preferences: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     sheet_data = get_sheet_data(sheet_id, sheet_name)
@@ -349,4 +349,3 @@ def import_cases_from_sheet(
         "metrics": summarize_cases(cases),
         "totalCases": len(cases),
     }
-

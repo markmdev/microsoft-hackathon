@@ -91,7 +91,7 @@ export const initialDashboardState: DashboardState = {
   liveFeed: {
     enabled: true,
     nextCaseIndex: 0,
-    intervalMs: 5000,
+    intervalMs: 20000,
   },
   sheet: {
     sheetId: "",

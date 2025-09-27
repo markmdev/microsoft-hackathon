@@ -49,7 +49,7 @@ class TriagePreferencesModel(BaseModel):
 class SheetSyncRequest(BaseModel):
     sheet_id: str = Field(alias="sheet_id")
     sheet_name: Optional[str] = Field(default=None, alias="sheet_name")
-    visible_case_limit: int = Field(default=3, alias="visible_case_limit")
+    visible_case_limit: int = Field(default=97, alias="visible_case_limit")
     triage_preferences: Optional[TriagePreferencesModel] = Field(
         default=None, alias="triage_preferences"
     )
@@ -150,4 +150,3 @@ async def update_triage(request: TriageUpdateRequest):
         )
     except Exception as exc:  # pragma: no cover - defensive logging
         raise HTTPException(status_code=500, detail=f"Failed to update triage preferences: {exc}")
-

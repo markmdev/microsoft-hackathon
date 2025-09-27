@@ -8,8 +8,8 @@ interface NotificationsPanelProps {
 
 export function NotificationsPanel({ notifications, onDismiss }: NotificationsPanelProps) {
   return (
-    <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-center justify-between">
+    <section className="flex flex-col gap-3 rounded-xl border border-border bg-card shadow-sm h-full">
+      <div className="flex items-center justify-between p-5 border-b border-border">
         <div>
           <h2 className="text-lg font-semibold">Triage Alerts</h2>
           <p className="text-sm text-muted-foreground">
@@ -21,7 +21,8 @@ export function NotificationsPanel({ notifications, onDismiss }: NotificationsPa
         </span>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex-1 overflow-y-auto px-5 pb-5">
+        <div className="flex flex-col gap-3">
         {notifications.length === 0 && (
           <div className="rounded border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
             No active alerts. Update your triage preferences to monitor specific matters.
@@ -50,6 +51,7 @@ export function NotificationsPanel({ notifications, onDismiss }: NotificationsPa
             </p>
           </article>
         ))}
+        </div>
       </div>
     </section>
   );
