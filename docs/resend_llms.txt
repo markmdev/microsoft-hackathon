@@ -1,0 +1,166 @@
+# Resend
+
+## Docs
+
+- [Create API key](https://resend.com/docs/api-reference/api-keys/create-api-key.md): Add a new API key to authenticate communications with Resend.
+- [Delete API key](https://resend.com/docs/api-reference/api-keys/delete-api-key.md): Remove an existing API key.
+- [List API keys](https://resend.com/docs/api-reference/api-keys/list-api-keys.md): Retrieve a list of API keys for the authenticated user.
+- [Create Audience](https://resend.com/docs/api-reference/audiences/create-audience.md): Create a list of contacts.
+- [Delete Audience](https://resend.com/docs/api-reference/audiences/delete-audience.md): Remove an existing audience.
+- [Retrieve Audience](https://resend.com/docs/api-reference/audiences/get-audience.md): Retrieve a single audience.
+- [List Audiences](https://resend.com/docs/api-reference/audiences/list-audiences.md): Retrieve a list of audiences.
+- [Create Broadcast](https://resend.com/docs/api-reference/broadcasts/create-broadcast.md): Create a new broadcast to send to your audience.
+- [Delete Broadcast](https://resend.com/docs/api-reference/broadcasts/delete-broadcast.md): Remove an existing broadcast.
+- [Retrieve Broadcast](https://resend.com/docs/api-reference/broadcasts/get-broadcast.md): Retrieve a single broadcast.
+- [List Broadcasts](https://resend.com/docs/api-reference/broadcasts/list-broadcasts.md): Retrieve a list of broadcast.
+- [Send Broadcast](https://resend.com/docs/api-reference/broadcasts/send-broadcast.md): Start sending broadcasts to your audience through the Resend API.
+- [Update Broadcast](https://resend.com/docs/api-reference/broadcasts/update-broadcast.md): Update a broadcast to send to your audience.
+- [Create Contact](https://resend.com/docs/api-reference/contacts/create-contact.md): Create a contact inside an audience.
+- [Delete Contact](https://resend.com/docs/api-reference/contacts/delete-contact.md): Remove an existing contact from an audience.
+- [Retrieve Contact](https://resend.com/docs/api-reference/contacts/get-contact.md): Retrieve a single contact from an audience.
+- [List Contacts](https://resend.com/docs/api-reference/contacts/list-contacts.md): Show all contacts from an audience.
+- [Update Contact](https://resend.com/docs/api-reference/contacts/update-contact.md): Update an existing contact.
+- [Create Domain](https://resend.com/docs/api-reference/domains/create-domain.md): Create a domain through the Resend Email API.
+- [Delete Domain](https://resend.com/docs/api-reference/domains/delete-domain.md): Remove an existing domain.
+- [Retrieve Domain](https://resend.com/docs/api-reference/domains/get-domain.md): Retrieve a single domain for the authenticated user.
+- [List Domains](https://resend.com/docs/api-reference/domains/list-domains.md): Retrieve a list of domains for the authenticated user.
+- [Update Domain](https://resend.com/docs/api-reference/domains/update-domain.md): Update an existing domain.
+- [Verify Domain](https://resend.com/docs/api-reference/domains/verify-domain.md): Verify an existing domain.
+- [Cancel Email](https://resend.com/docs/api-reference/emails/cancel-email.md): Cancel a scheduled email.
+- [Retrieve Email](https://resend.com/docs/api-reference/emails/retrieve-email.md): Retrieve a single email.
+- [Send Batch Emails](https://resend.com/docs/api-reference/emails/send-batch-emails.md): Trigger up to 100 batch emails at once.
+- [Send Email](https://resend.com/docs/api-reference/emails/send-email.md): Start sending emails through the Resend Email API.
+- [Update Email](https://resend.com/docs/api-reference/emails/update-email.md): Update a scheduled email.
+- [Errors](https://resend.com/docs/api-reference/errors.md): Troubleshoot problems with this comprehensive breakdown of all error codes.
+- [Introduction](https://resend.com/docs/api-reference/introduction.md): Understand general concepts, response codes, and authentication strategies.
+- [Rate Limit](https://resend.com/docs/api-reference/rate-limit.md): Understand rate limits and how to increase them.
+- [Introduction](https://resend.com/docs/dashboard/api-keys/introduction.md): Visualize all the API Keys on the Resend Dashboard.
+- [Managing Contacts](https://resend.com/docs/dashboard/audiences/contacts.md): How to manage and import contacts to your audiences.
+- [Managing Audiences](https://resend.com/docs/dashboard/audiences/introduction.md): Learn how to add, update, retrieve, and remove contacts that you send Broadcasts to.
+- [Managing Unsubscribed Contacts](https://resend.com/docs/dashboard/audiences/managing-unsubscribe-list.md): Learn how to check and remove recipients who have unsubscribed to your marketing emails.
+- [Managing Broadcasts](https://resend.com/docs/dashboard/broadcasts/introduction.md): Send marketing emails efficiently without code.
+- [Performance Tracking](https://resend.com/docs/dashboard/broadcasts/performance-tracking.md): Track your Broadcasts email performance in real-time
+- [Implementing BIMI](https://resend.com/docs/dashboard/domains/bimi.md): Set up BIMI to gain brand recognition by displaying your logo in the inbox.
+- [Implementing DMARC](https://resend.com/docs/dashboard/domains/dmarc.md): Implement DMARC to build trust in your domain and protect against email spoofing and unauthorized use of your domain in email messages.
+- [Managing Domains](https://resend.com/docs/dashboard/domains/introduction.md): Visualize all the domains on the Resend Dashboard.
+- [Choosing a Region](https://resend.com/docs/dashboard/domains/regions.md): Resend offers sending from multiple regions
+- [Add an unsubscribe link to transactional emails](https://resend.com/docs/dashboard/emails/add-unsubscribe-to-transactional-emails.md): Learn how to give email recipients the ability to unsubscribe without searching for the unsubscribe link.
+- [Attachments](https://resend.com/docs/dashboard/emails/attachments.md): Send emails with attachments.
+- [Batch Validation Modes](https://resend.com/docs/dashboard/emails/batch-validation-modes.md): Control how batch validation is performed.
+- [Custom Headers](https://resend.com/docs/dashboard/emails/custom-headers.md): Customize how emails are sent with your own headers.
+- [Deliverability Insights](https://resend.com/docs/dashboard/emails/deliverability-insights.md): Improve your deliverability with tailored insights based on your sending.
+- [Email Bounces](https://resend.com/docs/dashboard/emails/email-bounces.md): Understanding and resolving delivery issues.
+- [Email Templates](https://resend.com/docs/dashboard/emails/email-templates.md): Use high quality, unstyled components for your transactional emails using React and Typescript
+- [Embed Inline Images](https://resend.com/docs/dashboard/emails/embed-inline-images.md): Send emails with inline images.
+- [Idempotency Keys](https://resend.com/docs/dashboard/emails/idempotency-keys.md): Use idempotency keys to ensure that emails are sent only once.
+- [Managing Emails](https://resend.com/docs/dashboard/emails/introduction.md): Learn how to view and manage all sent emails on the Resend Dashboard.
+- [Schedule Email](https://resend.com/docs/dashboard/emails/schedule-email.md): Send emails at a specific time without additional complexity.
+- [Send Test Emails](https://resend.com/docs/dashboard/emails/send-test-emails.md): Simulate different events by sending test emails.
+- [Managing Tags](https://resend.com/docs/dashboard/emails/tags.md): Add unique identifiers to emails sent.
+- [Managing Billing](https://resend.com/docs/dashboard/settings/billing.md): Manage your account subscription and billing information
+- [Managing Teams](https://resend.com/docs/dashboard/settings/team.md): Manage your account across multiple teams
+- [Custom Unsubscribe Page](https://resend.com/docs/dashboard/settings/unsubscribe-page.md): Customize your unsubscribe page
+- [Event Types](https://resend.com/docs/dashboard/webhooks/event-types.md): List of supported event types and their payload.
+- [Managing Webhooks](https://resend.com/docs/dashboard/webhooks/introduction.md): Use webhooks to notify your application about email events.
+- [Verify Webhooks Requests](https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests.md): Learn how to use the signing secret to verify your webhooks.
+- [Examples](https://resend.com/docs/examples.md): Explore sample apps for different use cases.
+- [Integrations](https://resend.com/docs/integrations.md): Integrate Resend with the tools you already use.
+- [Introduction](https://resend.com/docs/introduction.md): Resend is the email API for developers.
+- [How to add the Resend integration to your Anything project](https://resend.com/docs/knowledge-base/anything-integration.md): Learn how to add the Resend integration to your Anything project.
+- [Audience Hygiene: How to keep your Audiences in good shape?](https://resend.com/docs/knowledge-base/audience-hygiene.md): Learn strategies for maintaining good audience hygiene and maximizing email deliverability.
+- [Send emails with Base44 and Resend](https://resend.com/docs/knowledge-base/base44-integration.md): Learn how to add the Resend integration to your Base44 project.
+- [Send emails with Bolt.new and Resend](https://resend.com/docs/knowledge-base/bolt-new-integration.md): Learn how to add the Resend integration to your Bolt.new project.
+- [Cloudflare](https://resend.com/docs/knowledge-base/cloudflare.md): Verify your domain on Cloudflare with Resend.
+- [How to set up E2E testing with Playwright](https://resend.com/docs/knowledge-base/end-to-end-testing-with-playwright.md): End to end testing ensures your entire app flow is fully functioning.
+- [Gandi](https://resend.com/docs/knowledge-base/gandi.md): Verify your domain on Gandi with Resend.
+- [Hetzner](https://resend.com/docs/knowledge-base/hetzner.md): Verify your domain on Hetzner with Resend.
+- [Hostinger](https://resend.com/docs/knowledge-base/hostinger.md): Verify your domain on Hostinger with Resend.
+- [How can I delete my Resend account?](https://resend.com/docs/knowledge-base/how-can-i-delete-my-resend-account.md): How to request your Resend account and data to be deleted.
+- [How can I delete my Resend team?](https://resend.com/docs/knowledge-base/how-can-i-delete-my-team.md): How to request your Resend team and team data to be deleted.
+- [Can I receive emails with Resend?](https://resend.com/docs/knowledge-base/how-can-i-receive-emails-with-resend.md): Inbound email is in early access.
+- [How do Dedicated IPs work?](https://resend.com/docs/knowledge-base/how-do-dedicated-ips-work.md): When are Dedicated IPs helpful, and how can they be requested.
+- [How do I avoid conflicts with my MX records?](https://resend.com/docs/knowledge-base/how-do-i-avoid-conflicting-with-my-mx-records.md): Learn how to avoid conflicts with your existing MX records when setting up a Resend domain.
+- [How do I avoid Gmail's spam folder?](https://resend.com/docs/knowledge-base/how-do-i-avoid-gmails-spam-folder.md): Learn how to improve inbox placement in Gmail.
+- [How do I avoid Outlook's spam folder?](https://resend.com/docs/knowledge-base/how-do-i-avoid-outlooks-spam-folder.md): Learn how to improve inbox placement in Outlook.
+- [How do I ensure sensitive data isn't stored on Resend?](https://resend.com/docs/knowledge-base/how-do-i-ensure-sensitive-data-isnt-stored-on-resend.md): Information on how we can help you protect your customer's information.
+- [How do I fix CORS issues?](https://resend.com/docs/knowledge-base/how-do-i-fix-cors-issues.md): Information on recommended options to avoid CORS errors when sending emails.
+- [How do I maximize deliverability for Supabase Auth emails?](https://resend.com/docs/knowledge-base/how-do-i-maximize-deliverability-for-supabase-auth-emails.md): Everything you should do before you start sending authentication emails with Resend and Supabase.
+- [How do I send with an avatar?](https://resend.com/docs/knowledge-base/how-do-i-send-with-an-avatar.md): Learn how to show your avatar in the inbox of your recipients.
+- [How do I set up Apple Branded Mail?](https://resend.com/docs/knowledge-base/how-do-i-set-set-up-apple-branded-mail.md): Learn how to implement Apple Branded Mail to display your logo in Apple Mail clients.
+- [How to Handle API Keys](https://resend.com/docs/knowledge-base/how-to-handle-api-keys.md): Learn our suggested practices for handling API keys.
+- [Introduction](https://resend.com/docs/knowledge-base/introduction.md): A collection of answers to frequently asked questions.
+- [IONOS](https://resend.com/docs/knowledge-base/ionos.md): Verify your domain on IONOS with Resend.
+- [Is it better to send emails from a subdomain or the root domain?](https://resend.com/docs/knowledge-base/is-it-better-to-send-emails-from-a-subdomain-or-the-root-domain.md): Discover why sending emails from a subdomain can be better than using a root domain.
+- [Send emails with Leap and Resend](https://resend.com/docs/knowledge-base/leap-new-integration.md): Learn how to add the Resend integration to your Leap.new project.
+- [Send emails with Lovable and Resend](https://resend.com/docs/knowledge-base/lovable-integration.md): Learn how to add the Resend integration to your Lovable project.
+- [MCP Server](https://resend.com/docs/knowledge-base/mcp-server.md): Learn how to use the MCP Server to send emails.
+- [Namecheap](https://resend.com/docs/knowledge-base/namecheap.md): Verify your domain on Namecheap with Resend.
+- [Porkbun](https://resend.com/docs/knowledge-base/porkbun.md): Verify your domain on Porkbun with Resend.
+- [Send emails with Replit and Resend](https://resend.com/docs/knowledge-base/replit-integration.md): Learn how to add the Resend integration to your Replit project.
+- [What are Resend account sending limits?](https://resend.com/docs/knowledge-base/resend-sending-limits.md): Learn what different sending limits apply to accounts.
+- [AWS Route 53](https://resend.com/docs/knowledge-base/route53.md): Verify your domain on Route 53 with Resend.
+- [How to prevent bounces with @privaterelay.appleid.com recipients?](https://resend.com/docs/knowledge-base/sending-apple-private-relay.md): Sending to Apple Private Email Relay requires specific configuration steps to ensure your emails get delivered
+- [Should I add an unsubscribe link to all of my emails sent with Resend?](https://resend.com/docs/knowledge-base/should-i-add-an-unsubscribe-link.md): Learn best practices about using unsubscribe links.
+- [Squarespace](https://resend.com/docs/knowledge-base/squarespace.md): Verify your domain on Squarespace with Resend.
+- [Strato](https://resend.com/docs/knowledge-base/strato.md): Verify your domain on Strato with Resend.
+- [Send emails with v0 and Resend](https://resend.com/docs/knowledge-base/v0-integration.md): Learn how to add the Resend integration to your v0 project.
+- [Vercel](https://resend.com/docs/knowledge-base/vercel.md): Verify your domain on Vercel with Resend.
+- [Domain and/or IP Warm-up Guide](https://resend.com/docs/knowledge-base/warming-up.md): Learn how to warm up a domain or IP to avoid deliverability issues.
+- [What attachment types are not supported?](https://resend.com/docs/knowledge-base/what-attachment-types-are-not-supported.md): Learn which file attachment extensions are unsupported.
+- [What counts as email consent?](https://resend.com/docs/knowledge-base/what-counts-as-email-consent.md): Learn what valid email permission looks like and why it matters.
+- [What email addresses to use for testing?](https://resend.com/docs/knowledge-base/what-email-addresses-to-use-for-testing.md): Learn what email addresses are safe to use for testing with Resend
+- [What if an email says delivered but the recipient has not received it?](https://resend.com/docs/knowledge-base/what-if-an-email-says-delivered-but-the-recipient-has-not-received-it.md): Learn the steps to take when an email is delivered, but the recipient does not receive it.
+- [What if my domain is not verifying?](https://resend.com/docs/knowledge-base/what-if-my-domain-is-not-verifying.md): Learn what steps to take when your domain doesn't seem to verifying.
+- [What is Resend Pricing](https://resend.com/docs/knowledge-base/what-is-resend-pricing.md): Learn more about Resend's pricing plans.
+- [What sending feature should I be using?](https://resend.com/docs/knowledge-base/what-sending-feature-to-use.md): How to pick between our different sending features depending on your number of recipients and the nature of the message.
+- [What's the difference between Opportunistic TLS vs Enforced TLS?](https://resend.com/docs/knowledge-base/whats-the-difference-between-opportunistic-tls-vs-enforced-tls.md): Understand the different TLS configurations available.
+- [Why are my emails landing on the Suppression List?](https://resend.com/docs/knowledge-base/why-are-my-emails-landing-on-the-suppression-list.md): Learn why your emails land on the Suppression List and how to remove them.
+- [Why are my open rates not accurate?](https://resend.com/docs/knowledge-base/why-are-my-open-rates-not-accurate.md): Learn why your open rate statistics are not accurate and what you can do about it.
+- [Official SDKs](https://resend.com/docs/sdks.md): Open source client libraries for your favorite platforms.
+- [Security](https://resend.com/docs/security.md): An overview of Resend security features and practices.
+- [Send emails with Astro](https://resend.com/docs/send-with-astro.md): Learn how to send your first email using Astro, Resend, and Node.js.
+- [Send emails using Auth0 with SMTP](https://resend.com/docs/send-with-auth0-smtp.md): Learn how to integrate Auth0 with Resend SMTP.
+- [Send emails with AWS Lambda](https://resend.com/docs/send-with-aws-lambda.md): Learn how to send your first email using AWS Lambda.
+- [Send emails with Axum](https://resend.com/docs/send-with-axum.md): Send your first email using Axum and the Resend Rust SDK.
+- [Send emails with Bun](https://resend.com/docs/send-with-bun.md): Learn how to send your first email using Bun and the Resend Node.js SDK.
+- [Send emails with Cloudflare Workers](https://resend.com/docs/send-with-cloudflare-workers.md): Learn how to send your first email using Cloudflare Workers.
+- [Send emails using Customer.io with SMTP](https://resend.com/docs/send-with-customer-io-smtp.md): Learn how to integrate Customer.io with Resend SMTP.
+- [Send emails with Deno Deploy](https://resend.com/docs/send-with-deno-deploy.md): Learn how to send your first email using Deno Deploy.
+- [Send emails using Django with SMTP](https://resend.com/docs/send-with-django-smtp.md): Learn how to integrate Django with Resend SMTP.
+- [Send emails with .NET](https://resend.com/docs/send-with-dotnet.md): Learn how to send your first email using the Resend .NET SDK.
+- [Send emails with Elixir](https://resend.com/docs/send-with-elixir.md): Learn how to send your first email using the Resend Elixir SDK.
+- [Send emails with Express](https://resend.com/docs/send-with-express.md): Learn how to send your first email using Express and the Resend Node.js SDK.
+- [Send emails with FastAPI](https://resend.com/docs/send-with-fastapi.md): Learn how to send your first email using FastAPI and the Resend Python SDK.
+- [Send emails with Flask](https://resend.com/docs/send-with-flask.md): Learn how to send your first email using Flask and the Resend Python SDK.
+- [Send emails with Go](https://resend.com/docs/send-with-go.md): Learn how to send your first email using the Resend Go SDK.
+- [Send emails with Hono](https://resend.com/docs/send-with-hono.md): Learn how to send your first email using Hono and the Resend Node.js SDK.
+- [Send emails with Java](https://resend.com/docs/send-with-java.md): Learn how to send your first email using the Resend Java SDK.
+- [Send emails with Laravel](https://resend.com/docs/send-with-laravel.md): Learn how to send your first email using Laravel.
+- [Send emails using Laravel with SMTP](https://resend.com/docs/send-with-laravel-smtp.md): Learn how to send your first email using Laravel with SMTP.
+- [Send emails using Liferay with SMTP](https://resend.com/docs/send-with-liferay-smtp.md): Learn how to integrate Liferay with Resend SMTP.
+- [Send emails using Metabase with SMTP](https://resend.com/docs/send-with-metabase-smtp.md): Learn how to integrate Metabase with Resend SMTP.
+- [Send emails using NextAuth with SMTP](https://resend.com/docs/send-with-nextauth-smtp.md): Learn how to send your first email using NextAuth.
+- [Send emails with Next.js](https://resend.com/docs/send-with-nextjs.md): Learn how to send your first email using Next.js and the Resend Node.js SDK.
+- [Send emails with Node.js](https://resend.com/docs/send-with-nodejs.md): Learn how to send your first email using the Resend Node.js SDK.
+- [Send emails using Nodemailer with SMTP](https://resend.com/docs/send-with-nodemailer-smtp.md): Learn how to send your first email using Nodemailer with SMTP.
+- [Send emails with Nuxt](https://resend.com/docs/send-with-nuxt.md): Learn how to send your first email using Nuxt and the Resend Node.js SDK.
+- [Send emails with Phoenix](https://resend.com/docs/send-with-phoenix.md): Learn how to send your first email using Phoenix and the Resend Elixir SDK.
+- [Send emails with PHP](https://resend.com/docs/send-with-php.md): Learn how to send your first email using the Resend PHP SDK.
+- [Send emails using PHPMailer with SMTP](https://resend.com/docs/send-with-phpmailer-smtp.md): Learn how to send your first email using PHPMailer with SMTP.
+- [Send emails with Python](https://resend.com/docs/send-with-python.md): Learn how to send your first email using the Resend Python SDK.
+- [Send emails with Rails](https://resend.com/docs/send-with-rails.md): Learn how to send your first email using Rails and the Resend Ruby SDK.
+- [Send emails using Rails with SMTP](https://resend.com/docs/send-with-rails-smtp.md): Learn how to integrate Rails with Resend SMTP.
+- [Send emails with Railway](https://resend.com/docs/send-with-railway.md): Learn how to send your first email using Railway and the Resend Node.js SDK.
+- [Send emails with RedwoodJS](https://resend.com/docs/send-with-redwoodjs.md): Learn how to send your first email using Redwood.js and the Resend Node.js SDK.
+- [Send emails with Remix](https://resend.com/docs/send-with-remix.md): Learn how to send your first email using Remix and the Resend Node.js SDK.
+- [Send emails using Retool with SMTP](https://resend.com/docs/send-with-retool-smtp.md): Learn how to integrate Retool with Resend SMTP.
+- [Send emails with Ruby](https://resend.com/docs/send-with-ruby.md): Learn how to send your first email using the Resend Ruby SDK.
+- [Send emails with Rust](https://resend.com/docs/send-with-rust.md): Learn how to send your first email using the Resend Rust SDK.
+- [Send emails with Sinatra](https://resend.com/docs/send-with-sinatra.md): Learn how to send your first email using Sinatra and the Resend Ruby SDK.
+- [Send emails with SMTP](https://resend.com/docs/send-with-smtp.md): Learn how to integrate Resend via SMTP.
+- [Send emails with Supabase Edge Functions](https://resend.com/docs/send-with-supabase-edge-functions.md): Learn how to send your first email using Supabase Edge Functions.
+- [Send emails using Supabase with SMTP](https://resend.com/docs/send-with-supabase-smtp.md): Learn how to integrate Supabase Auth with Resend SMTP.
+- [Send emails with SvelteKit](https://resend.com/docs/send-with-sveltekit.md): Learn how to send your first email using SvelteKit and the Resend Node.js SDK.
+- [Send emails with Symfony](https://resend.com/docs/send-with-symfony.md): Learn how to send your first email using the Symfony Resend Mailer Bridge.
+- [Send emails with Vercel Functions](https://resend.com/docs/send-with-vercel-functions.md): Learn how to send your first email using Vercel Functions.
+- [Send emails using WordPress with SMTP](https://resend.com/docs/send-with-wordpress-smtp.md): Learn how to send your first email using Wordpress.

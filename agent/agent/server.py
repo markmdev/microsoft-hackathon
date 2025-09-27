@@ -1,15 +1,18 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Optional
-import os
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 # Load environment variables from .env/.env.local (repo root or agent dir) if present
 try:
     from dotenv import load_dotenv  # type: ignore
-except Exception:
-    load_dotenv = None  # python-dotenv may not be installed yet
+except Exception:  # pragma: no cover - optional dependency
+    load_dotenv = None
+
 
 def _load_env_files() -> None:
     if load_dotenv is None:
@@ -17,203 +20,134 @@ def _load_env_files() -> None:
     here = Path(__file__).resolve()
     candidates = [
         here.parents[2] / ".env.local",  # repo root/.env.local
-        here.parents[2] / ".env",        # repo root/.env
+        here.parents[2] / ".env",  # repo root/.env
         here.parents[1] / ".env.local",  # agent/.env.local
-        here.parents[1] / ".env",        # agent/.env
+        here.parents[1] / ".env",  # agent/.env
     ]
-    for p in candidates:
-        if p.exists():
-            load_dotenv(p, override=False)
+    for path in candidates:
+        if path.exists():
+            load_dotenv(path, override=False)
+
 
 _load_env_files()
 
 from .agent import agentic_chat_router
-from .sheets_integration import get_sheet_data, convert_sheet_to_canvas_items, sync_canvas_to_sheet, get_sheet_names, create_new_sheet
+from .profile import get_profile, update_triage_preferences
+from .sheets_integration import get_sheet_names, import_cases_from_sheet
 
 app = FastAPI()
 app.include_router(agentic_chat_router)
 
-# Request models
+
+class TriagePreferencesModel(BaseModel):
+    categoriesOfInterest: list[str] = Field(default_factory=list)
+    requireInjury: bool = False
+    includePropertyDamage: bool = True
+    citiesOfInterest: list[str] = Field(default_factory=list)
+
+
 class SheetSyncRequest(BaseModel):
-    sheet_id: str
-    sheet_name: Optional[str] = None
+    sheet_id: str = Field(alias="sheet_id")
+    sheet_name: Optional[str] = Field(default=None, alias="sheet_name")
+    visible_case_limit: int = Field(default=3, alias="visible_case_limit")
+    triage_preferences: Optional[TriagePreferencesModel] = Field(
+        default=None, alias="triage_preferences"
+    )
 
-class CanvasToSheetSyncRequest(BaseModel):
-    canvas_state: dict
-    sheet_id: str
-    sheet_name: Optional[str] = None
+    class Config:
+        populate_by_name = True
 
-class CreateSheetRequest(BaseModel):
-    title: str
 
-# Sheets sync endpoint
+class TriageUpdateRequest(BaseModel):
+    profile_id: str = Field(default="default", alias="profile_id")
+    preferences: TriagePreferencesModel
+
+    class Config:
+        populate_by_name = True
+
+
 @app.post("/sheets/sync")
 async def sync_sheets(request: SheetSyncRequest):
-    """
-    Sync data from Google Sheets to canvas format.
-    
-    Args:
-        request: Contains sheet_id to import from
-        
-    Returns:
-        Canvas state with items converted from sheet data
-    """
+    """Import cases from Google Sheets and structure them for the dashboard."""
     try:
-        # Extract sheet ID from URL if full URL is provided
-        sheet_id = request.sheet_id
-        if "/spreadsheets/d/" in sheet_id:
-            # Extract ID from Google Sheets URL
-            start = sheet_id.find("/spreadsheets/d/") + len("/spreadsheets/d/")
-            end = sheet_id.find("/", start)
-            if end == -1:
-                end = sheet_id.find("#", start)
-            if end == -1:
-                end = len(sheet_id)
-            sheet_id = sheet_id[start:end]
-        
-        sheet_name = request.sheet_name
-        if sheet_name:
-            print(f"Syncing sheet: {sheet_id} (sheet: {sheet_name})")
-        else:
-            print(f"Syncing sheet: {sheet_id} (default sheet)")
-        
-        # Fetch sheet data using Composio
-        sheet_data = get_sheet_data(sheet_id, sheet_name)
-        if not sheet_data:
-            raise HTTPException(
-                status_code=400, 
-                detail="Failed to fetch sheet data. Please check the sheet ID and ensure it's accessible."
-            )
-        
-        # Convert to canvas items
-        canvas_data = convert_sheet_to_canvas_items(sheet_data, sheet_id)
-        
-        return JSONResponse(content={
-            "success": True,
-            "data": canvas_data,
-            "message": f"Successfully imported {len(canvas_data['items'])} items from sheet '{canvas_data['globalTitle']}'"
-        })
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error in sheets sync: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
+        print(
+            "Syncing sheet:",
+            request.sheet_id,
+            "sheet:",
+            request.sheet_name or "(default)",
         )
 
-@app.post("/sync-to-sheets")
-async def sync_canvas_to_sheets(request: CanvasToSheetSyncRequest):
-    """
-    Sync canvas state to Google Sheets.
-    
-    Args:
-        request: Contains canvas_state and sheet_id
-        
-    Returns:
-        Sync result status
-    """
-    try:
-        sheet_name_info = f" (sheet: {request.sheet_name})" if request.sheet_name else ""
-        print(f"[SYNC] Syncing canvas to sheet: {request.sheet_id}{sheet_name_info}")
-        
-        # Call the sync function with sheet name
-        result = sync_canvas_to_sheet(request.sheet_id, request.canvas_state, request.sheet_name)
-        
-        if result.get("success"):
-            return JSONResponse(content={
-                "success": True,
-                "message": result.get("message"),
-                "items_synced": result.get("items_synced", 0)
-            })
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail=result.get("error", "Failed to sync canvas to sheets")
-            )
-            
+        prefs = request.triage_preferences.dict() if request.triage_preferences else None
+        result = import_cases_from_sheet(
+            request.sheet_id,
+            request.sheet_name,
+            visible_case_limit=request.visible_case_limit,
+            triage_preferences=prefs,
+        )
+
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Import failed"))
+
+        return JSONResponse(content=result)
+
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Error in canvas-to-sheets sync: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
+    except Exception as exc:  # pragma: no cover - defensive logging
+        print(f"Error in sheets sync: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {exc}")
+
 
 @app.post("/sheets/list")
-async def list_sheet_names(request: SheetSyncRequest):
-    """
-    List available sheet names in a Google Spreadsheet.
-    
-    Args:
-        request: Contains sheet_id
-        
-    Returns:
-        List of available sheet names
-    """
+async def list_sheet_names_endpoint(request: SheetSyncRequest):
+    """List available sheet names in a Google Spreadsheet."""
     try:
         print(f"Listing sheets in: {request.sheet_id}")
-        
-        # Get sheet names using Composio
         sheet_names = get_sheet_names(request.sheet_id)
         if not sheet_names:
             raise HTTPException(
-                status_code=400, 
-                detail="Failed to get sheet names. Please check the sheet ID and ensure it's accessible."
+                status_code=400,
+                detail="Failed to get sheet names. Please check the sheet ID and ensure it's accessible.",
             )
-        
-        return JSONResponse(content={
-            "success": True,
-            "sheet_names": sheet_names,
-            "count": len(sheet_names)
-        })
-        
+
+        return JSONResponse(
+            content={
+                "success": True,
+                "sheetNames": sheet_names,
+                "count": len(sheet_names),
+            }
+        )
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Error in sheet listing: {e}")
+    except Exception as exc:  # pragma: no cover - defensive logging
+        print(f"Error in sheet listing: {exc}")
         raise HTTPException(
             status_code=500,
-            detail=f"Internal server error: {str(e)}"
+            detail=f"Internal server error: {exc}",
         )
 
-@app.post("/sheets/create")
-async def create_sheet(request: CreateSheetRequest):
-    """
-    Create a new Google Sheet.
-    
-    Args:
-        request: Contains title for the new sheet
-        
-    Returns:
-        New sheet details including sheet_id and URL
-    """
+
+@app.get("/profile")
+async def profile_endpoint():
+    """Return the current lawyer profile."""
     try:
-        print(f"Creating new sheet with title: {request.title}")
-        
-        # Create new sheet using Composio
-        result = create_new_sheet(request.title)
-        if not result.get("success"):
-            raise HTTPException(
-                status_code=400, 
-                detail=result.get("error", "Failed to create new sheet")
-            )
-        
-        return JSONResponse(content={
-            "success": True,
-            "sheet_id": result.get("sheet_id"),
-            "sheet_url": result.get("sheet_url"),
-            "title": result.get("title"),
-            "message": f"Successfully created new sheet '{request.title}'"
-        })
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error creating sheet: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
+        profile = get_profile()
+        return JSONResponse(content={"success": True, "profile": profile})
+    except Exception as exc:  # pragma: no cover - defensive logging
+        raise HTTPException(status_code=500, detail=f"Failed to load profile: {exc}")
+
+
+@app.post("/profile/triage")
+async def update_triage(request: TriageUpdateRequest):
+    """Update triage preferences stored on the backend."""
+    try:
+        updated_profile = update_triage_preferences(request.preferences.dict())
+        return JSONResponse(
+            content={
+                "success": True,
+                "profile": updated_profile,
+                "message": "Triage preferences updated.",
+            }
         )
+    except Exception as exc:  # pragma: no cover - defensive logging
+        raise HTTPException(status_code=500, detail=f"Failed to update triage preferences: {exc}")
+

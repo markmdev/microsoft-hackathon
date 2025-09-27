@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className="subpixel-antialiased">
         <CopilotKit
           runtimeUrl="/api/copilotkit"
-          agent="sample_agent"
+          agent="lawyer_copilot"
           publicApiKey={process.env.COPILOT_CLOUD_PUBLIC_API_KEY} // optional (for CopilotKit Cloud features)
         >
           {children}
