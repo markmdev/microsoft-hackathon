@@ -96,3 +96,34 @@ export async function fetchProfile(): Promise<ProfileResponse> {
   }
   return (await response.json()) as ProfileResponse;
 }
+
+export interface VoiceCallPayload {
+  incidentId: string;
+  fullName: string;
+  phoneNumber: string;
+  incidentSummary?: string;
+}
+
+export interface VoiceCallResponse {
+  success: boolean;
+  callId?: string;
+  message?: string;
+  payload?: unknown;
+  error?: string;
+}
+
+export async function triggerVoiceCall(payload: VoiceCallPayload): Promise<VoiceCallResponse> {
+  const response = await fetch("/api/voice/call", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Failed to initiate voice call", errorText);
+    throw new Error("Failed to initiate voice call");
+  }
+
+  return (await response.json()) as VoiceCallResponse;
+}

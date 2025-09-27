@@ -10,12 +10,14 @@ interface CaseDetailPanelProps {
   caseRecord?: CaseRecord;
   onSendEmail?: (caseRecord: CaseRecord) => void;
   onTriggerVoiceCall?: (caseRecord: CaseRecord) => void;
+  isVoiceCallPending?: boolean;
 }
 
 export function CaseDetailPanel({
   caseRecord,
   onSendEmail,
   onTriggerVoiceCall,
+  isVoiceCallPending = false,
 }: CaseDetailPanelProps) {
   const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(false);
 
@@ -38,6 +40,7 @@ export function CaseDetailPanel({
     : caseRecord.fullName;
   const narrative = caseRecord.incidentDescription?.trim() ?? "";
   const hasNarrative = narrative.length > 0;
+  const canTriggerVoiceCall = Boolean(onTriggerVoiceCall && caseRecord.phoneNumber?.trim());
 
   return (
     <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-sm">
@@ -56,10 +59,10 @@ export function CaseDetailPanel({
             <Button
               size="sm"
               variant="secondary"
-              disabled
+              disabled={!canTriggerVoiceCall || isVoiceCallPending}
               onClick={() => caseRecord && onTriggerVoiceCall?.(caseRecord)}
             >
-              Voice Call (coming soon)
+              {isVoiceCallPending ? "Calling..." : "Voice Call"}
             </Button>
             <Button size="sm" onClick={() => caseRecord && onSendEmail?.(caseRecord)}>
               Send Email

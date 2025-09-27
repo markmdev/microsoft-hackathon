@@ -12,7 +12,12 @@ import { SummarySection } from "@/components/dashboard/SummarySection";
 import { TriagePreferencesForm } from "@/components/dashboard/TriagePreferencesForm";
 import type { DashboardState, NotificationEntry, TriagePreferences } from "@/lib/dashboard/types";
 import { initialDashboardState } from "@/lib/dashboard/types";
-import { fetchProfile, importCases, updateTriagePreferences } from "@/lib/dashboard/api";
+import {
+  fetchProfile,
+  importCases,
+  triggerVoiceCall,
+  updateTriagePreferences,
+} from "@/lib/dashboard/api";
 import { cn } from "@/lib/utils";
 const HARDCODED_SHEET_ID = "1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk";
 
@@ -48,6 +53,7 @@ export default function LawyerDashboardPage() {
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<"neutral" | "success" | "error">("neutral");
+  const [dialingIncidentId, setDialingIncidentId] = useState<string | null>(null);
   const hasFetchedProfileRef = useRef(false);
 
   const activeCase = useMemo(
@@ -230,6 +236,38 @@ export default function LawyerDashboardPage() {
     [setStatusMessage, setStatusTone]
   );
 
+  const handleVoiceCall = useCallback(
+    async (caseRecord: NonNullable<typeof activeCase>) => {
+      if (!caseRecord.phoneNumber?.trim()) {
+        setStatusTone("error");
+        setStatusMessage(`No phone number available for ${caseRecord.fullName}.`);
+        return;
+      }
+
+      setDialingIncidentId(caseRecord.incidentId);
+      setStatusMessage(null);
+
+      try {
+        const response = await triggerVoiceCall({
+          incidentId: caseRecord.incidentId,
+          fullName: caseRecord.fullName,
+          phoneNumber: caseRecord.phoneNumber,
+          incidentSummary: caseRecord.incidentDescription,
+        });
+
+        setStatusTone("success");
+        setStatusMessage(response.message ?? `Dialing ${caseRecord.phoneNumber}`);
+      } catch (error) {
+        console.error("Voice call error", error);
+        setStatusTone("error");
+        setStatusMessage(`Failed to start call to ${caseRecord.fullName}.`);
+      } finally {
+        setDialingIncidentId(null);
+      }
+    },
+    [setDialingIncidentId, setStatusMessage, setStatusTone, triggerVoiceCall]
+  );
+
   useEffect(() => {
     if (!viewState.liveFeed.enabled) return;
     if (viewState.queuedCases.length === 0) return;
@@ -354,8 +392,9 @@ export default function LawyerDashboardPage() {
             <CaseDetailPanel
               caseRecord={activeCase}
               onSendEmail={handleSendEmail}
-              onTriggerVoiceCall={(record) =>
-                console.log("Voice call integration placeholder", record)
+              onTriggerVoiceCall={handleVoiceCall}
+              isVoiceCallPending={
+                Boolean(activeCase && dialingIncidentId === activeCase.incidentId)
               }
             />
           </div>
