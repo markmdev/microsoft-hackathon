@@ -1,95 +1,69 @@
-# Personal Lawyer Live Docket
+# Ross 🚲
 
-Hackathon-ready Copilot experience for personal injury lawyers. The app ingests police-report data from Google Sheets, stages it in a flashy dashboard, and surfaces triage alerts, legal follow-ups, and AI-assisted summaries via CopilotKit + LlamaIndex.
+**AI-powered client acquisition for personal injury lawyers**
 
-## Stack Overview
-- **UI**: Next.js (App Router), Tailwind, CopilotKit React UI, AG-UI interaction patterns
-- **Agent**: Python FastAPI service (`agent/`) running LlamaIndex with Composio MCP tooling
-- **Data Source**: Google Sheets (read via Composio) – lawyer teammate uploads CSV data to a single tab
-- **Notifications & Preferences**: In-memory profile store on the Python agent with UI controls for triage filters
-- **Outbound Hooks**: Resend (email) placeholder wired in UI, outbound voice button reserved for teammate integration
+## Overview
 
-## Feature Highlights
-- Google Sheet ingestion with column normalization (`incident_id`, `full_name`, `incident_category`, etc.)
-- Live incident feed that reveals queued reports every few seconds to mimic real-time intake
-- Summary metrics (injury count, property damage count, per-category totals)
-- Triage preference panel (categories, jurisdictions, injury/property toggles) stored server-side
-- Alert panel listing incidents matching the profile; dismissable in UI
-- Copilot chat (CopilotKit + LlamaIndex) grounded on shared dashboard state for natural language queries
+Ross is a fullstack AI agent that transforms how personal injury law firms identify and engage potential clients. The system ingests public police reports, intelligently extracts actionable leads, and orchestrates multi-channel outreach campaigns through email, direct mail, and AI-powered phone calls.
 
-## Getting Started
+Rather than manually reviewing hundreds of incident reports, lawyers can use natural language to filter prospects by criteria like location, injury severity, insurance coverage, and incident type. Once qualified leads are identified, Ross automates the entire outreach workflow—from drafting personalized communications to scheduling consultations via AI voice agents.
 
-### Prerequisites
-- Node.js 20+
-- Python 3.10+
-- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) (for Python deps)
-- OpenAI API key (`agent/.env`)
-- Composio API key & Google Sheets auth config (`agent/.env`)
+## Fullstack Agent
 
-### Install & Run
-```bash
-# Install (installs Node + Python deps)
-pnpm install
-# or npm install / yarn install / bun install
+Ross exemplifies fullstack agent integration through three core capabilities:
 
-# Start both Next.js UI and Python agent
-yarn dev
-# or pnpm dev / npm run dev / bun run dev
+**Structured Reasoning**: LlamaIndex orchestrates complex document processing pipelines, transforming unstructured police reports into queryable, actionable intelligence. The agent maintains context across multiple data sources and applies domain-specific legal heuristics to surface high-value leads.
 
-# UI: http://localhost:3000
-# Agent: http://localhost:9000
-```
+**Real-World Actions**: Through Composio and MCP integrations, Ross executes tangible business operations—sending emails via Resend, initiating direct mail through PostGrid/Lob APIs, conducting phone outreach with Vapi voice agents, and synchronizing appointment data to Google Sheets and Cal.com.
 
-Configure secrets in `agent/.env` (copy from `agent/.env.example`) and optional frontend keys in `.env.local`.
+**Dynamic Frontend**: CopilotKit and AG-UI power an adaptive interface that responds to natural language queries. The UI dynamically generates filtered views, data visualizations, and action buttons based on user intent, eliminating the need for complex form-based interfaces.
 
-## Importing Google Sheet Data
-1. Prepare a Google Sheet tab with the following headers (case-insensitive):
-   ```
-   incident_id, full_name, sex, home_address, phone_number,
-   incident_date, incident_time, location, incident_category,
-   resolution, injury_reported, property_damage,
-   fault_determination, incident_description
-   ```
-2. Launch the app — the dashboard automatically connects to the preconfigured sheet (`1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk`).
-3. The first six rows render instantly; the remaining rows stream into the live feed every few seconds to simulate real-time ingestion.
-4. Update the Google Sheet and press **Save** in the triage panel (or refresh) to re-sync with the new data.
+## Core Features
 
-## Triage Preferences & Alerts
-- Update categories or jurisdictions to monitor from the **Triage Preferences** form. Preferences persist on the backend (`/profile/triage`).
-- Toggle **Alert only when an injury is reported** to focus on more severe incidents.
-- Disable property-damage-only alerts by unchecking **Include property-damage-only incidents**.
-- Matching incidents appear in the **Triage Alerts** panel; dismissing hides them client-side while the backend keeps historical matches for re-imports.
+- **Automated Report Processing**: Ingests police reports and extracts structured data including parties involved, incident details, injury descriptions, insurance information, and contact details
+- **Intelligent Lead Summarization**: Generates concise, lawyer-focused summaries highlighting case viability factors
+- **Natural Language Filtering**: Enables conversational queries like "show me rear-end collisions in downtown with documented injuries and commercial insurance"
+- **Multi-Channel Outreach Orchestration**: Executes personalized campaigns across email, physical mail, and voice channels
+- **AI Voice Agent**: Conducts initial prospect calls, explains services, and books consultations directly into the lawyer's calendar
+- **Automated CRM Updates**: Logs all interactions and outcomes to Google Sheets for tracking and compliance
 
-## Copilot Chat
-`<CopilotChat />` (from CopilotKit) stays pinned on the right rail. It uses the shared `DashboardState` and LlamaIndex agent instructions defined in `agent/agent/agent.py`. Use it to:
-- Summarize newest incidents (the model reads `cases` + `queuedCases`)
-- Ask for follow-up tasks or email drafts (Resend integration stub)
-- Confirm triage configuration and next steps
+## User Flows
 
-## Project Structure
-```
-.
-├── agent/
-│   ├── agent.py               # LlamaIndex agent + system prompt + shared state
-│   ├── server.py              # FastAPI endpoints (/sheets/sync, /profile, ...)
-│   ├── sheets_integration.py  # Google Sheets ingestion + triage evaluation
-│   └── profile.py             # Backend profile store for triage prefs
-├── src/
-│   ├── app/page.tsx           # Next.js dashboard (live feed, metrics, chat)
-│   ├── app/api/               # Next.js API routes proxying to Python agent
-│   ├── components/dashboard/  # Dashboard UI building blocks
-│   └── lib/dashboard/         # Shared types + API helpers
-└── docs/                      # Source schema example + LLM doc links
-```
+### Lead Discovery Flow
+1. System continuously ingests new police reports (currently using synthetic dataset)
+2. LlamaIndex agent processes each report, extracting entities and relationships
+3. Leads appear in dashboard with AI-generated summaries and viability scores
+4. Lawyer reviews leads in spreadsheet view with inline chat assistance
 
-## Development Tips
-- Live feed cadence (`intervalMs`) and streaming toggle live in shared state (`DashboardState.liveFeed`). Adjust via `useCoAgent` or Python initial state.
-- To re-run triage after editing preferences, simply save the form—the UI calls `/profile/triage` then re-imports the sheet.
-- The Resend + voice call actions are currently console stubs. Wire actual APIs by extending `onSendEmail` / `onTriggerVoiceCall` in `page.tsx`.
+### Lead Qualification Flow
+1. Lawyer enters natural language filter in sidebar chat interface
+2. CopilotKit interprets query and dynamically adjusts displayed results
+3. System highlights matching criteria within each lead summary
+4. Lawyer can iteratively refine filters through conversation
 
-## Roadmap
-- Hook Resend SDK for real outbound notifications
-- Swap voice-call button to teammate’s integration endpoint
-- Persist profile + notifications to a durable store (Redis/Postgres) if required
-- Add richer charts (Recharts already installed) for category trends and response SLAs
-- Expand case workflow with tasks / notes for CRM-style functionality once MVP is locked
+### Outreach Execution Flow
+1. Lawyer selects qualified leads and chooses outreach channel
+2. For email: System drafts personalized message, lawyer reviews/edits, sends via Resend
+3. For direct mail: Generates letter content, initiates print/mail via PostGrid API
+4. For phone: Vapi agent places call, introduces firm, attempts consultation booking
+
+### Voice Agent Call Flow
+1. Vapi agent calls prospect using provided phone number
+2. Introduces law firm and explains potential assistance based on incident type
+3. Offers free consultation and checks availability
+4. Books appointment via Cal.com integration if prospect agrees
+5. Logs call outcome (contacted/not contacted, appointment status, notes) to Google Sheets
+
+## Tech Stack
+
+- **LlamaIndex**: Agent orchestration, document processing, knowledge retrieval
+- **Composio**: Tool integration layer for Google Sheets, Resend, Vapi connections
+- **CopilotKit/AG-UI**: Conversational interface and dynamic UI generation
+- **Vapi**: Voice agent automation and telephony
+- **Next.js**: Full-stack React framework
+- **TypeScript**: Type-safe development
+- **Cal.com**: Calendar integration for appointment scheduling
+
+## Current Scope
+
+The prototype demonstrates core capabilities using 100 synthetic police reports. Production deployment will integrate with police department portals for real-time report acquisition. Initial version focuses on basic outreach and scheduling—appointment modifications and follow-up sequences are planned for future releases.
