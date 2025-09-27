@@ -35,13 +35,13 @@ fault_determination, incident_description
   - `POST /sheets/sync`: ingest sheet + return dashboard payload
   - `POST /sheets/list`: enumerate tab names
   - `GET /profile`, `POST /profile/triage`: load/update backend triage profile
-- **Next.js dashboard** (`src/app/page.tsx`) now renders modular sections: sheet import controls, summary metrics, live case feed, case detail panel, triage preferences form, notifications, and Copilot chat.
+- **Next.js dashboard** (`src/app/page.tsx`) now renders modular sections: gradient summary metrics, live feed list with streaming animation, case detail panel, triage preferences form, notifications, and a persistent Copilot chat rail.
 - **Simulation**: queued cases surface into the live feed every 5 seconds (configurable via shared state).
 
 ## Usage Notes
 
-1. Populate Google Sheet with the schema above and copy the sheet ID (from URL) + optional tab name.
-2. Use the "Google Sheets Connection" form to import. First import exposes the first N cases immediately (default 4) and stages the remainder for the live ticker.
+1. Populate the shared Google Sheet (ID `1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk`) with the schema above.
+2. The dashboard auto-syncs on load; the first six rows display instantly and the rest stream in to mimic real-time ingestion.
 3. Update triage preferences (categories, jurisdictions, injury/property toggles) from the profile panel. Saving persists to the backend profile store and re-runs triage evaluation against the sheet.
 4. Notifications banner surfaces incidents matching the profile. Dismissing removes them locally while keeping history server-side for re-imports.
 5. "Voice Call" button is UI-only; teammate will connect to outbound dialer. "Send Email" triggers a Resend hook placeholder—wire actual API call next.
