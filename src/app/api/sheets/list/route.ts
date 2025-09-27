@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sheet_id } = body;
+    const sheetId = body.sheetId ?? body.sheet_id;
 
-    if (!sheet_id) {
+    if (!sheetId) {
       return NextResponse.json(
         { error: "Sheet ID is required" },
         { status: 400 }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        sheet_id: sheet_id,
+        sheet_id: sheetId,
       }),
     });
 

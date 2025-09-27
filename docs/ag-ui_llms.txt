@@ -1,0 +1,48 @@
+# Agent User Interaction Protocol
+
+## Docs
+
+- [Agents](https://docs.ag-ui.com/concepts/agents.md): Learn about agents in the Agent User Interaction Protocol
+- [Core architecture](https://docs.ag-ui.com/concepts/architecture.md): Understand how AG-UI connects front-end applications to AI agents
+- [Events](https://docs.ag-ui.com/concepts/events.md): Understanding events in the Agent User Interaction Protocol
+- [Messages](https://docs.ag-ui.com/concepts/messages.md): Understanding message structure and communication in AG-UI
+- [State Management](https://docs.ag-ui.com/concepts/state.md): Understanding state synchronization between agents and frontends in AG-UI
+- [Tools](https://docs.ag-ui.com/concepts/tools.md): Understanding tools and how they enable human-in-the-loop AI workflows
+- [Contributing](https://docs.ag-ui.com/development/contributing.md): How to participate in Agent User Interaction Protocol development
+- [Roadmap](https://docs.ag-ui.com/development/roadmap.md): Our plans for evolving Agent User Interaction Protocol
+- [What's New](https://docs.ag-ui.com/development/updates.md): The latest updates and improvements to AG-UI
+- [Activity Events](https://docs.ag-ui.com/drafts/activity-events.md): Proposal for representing ongoing agent progress between chat messages
+- [Generative User Interfaces](https://docs.ag-ui.com/drafts/generative-ui.md): AI-generated interfaces without custom tool renderers
+- [Interrupt-Aware Run Lifecycle](https://docs.ag-ui.com/drafts/interrupts.md): Native support for human-in-the-loop pauses and interrupts
+- [Meta Events](https://docs.ag-ui.com/drafts/meta-events.md): Annotations and signals independent of agent runs
+- [Multi-modal Messages](https://docs.ag-ui.com/drafts/multimodal-messages.md): Support for multimodal input messages including text, images, audio, and files
+- [Overview](https://docs.ag-ui.com/drafts/overview.md): Draft changes being considered for the AG-UI protocol
+- [Reasoning](https://docs.ag-ui.com/drafts/reasoning.md): Support for LLM reasoning visibility and continuity
+- [Serialization](https://docs.ag-ui.com/drafts/serialization.md): Stream serialization for chat history restoration and event compaction
+- [AG-UI Overview](https://docs.ag-ui.com/introduction.md)
+- [Build applications](https://docs.ag-ui.com/quickstart/applications.md): Build agentic applications utilizing compatible event AG-UI event streams
+- [Build clients](https://docs.ag-ui.com/quickstart/clients.md): Build a conversational CLI agent from scratch using AG-UI and Mastra
+- [Introduction](https://docs.ag-ui.com/quickstart/introduction.md): Learn how to get started building an AG-UI integration
+- [Middleware](https://docs.ag-ui.com/quickstart/middleware.md): Connect to existing protocols, in process agents or custom solutions via AG-UI
+- [Server](https://docs.ag-ui.com/quickstart/server.md): Implement AG-UI compatible servers
+- [AbstractAgent](https://docs.ag-ui.com/sdk/js/client/abstract-agent.md): Base agent implementation with core event handling
+- [HttpAgent](https://docs.ag-ui.com/sdk/js/client/http-agent.md): HTTP-based agent for connecting to remote AI agents
+- [Overview](https://docs.ag-ui.com/sdk/js/client/overview.md): Client package overview
+- [AgentSubscriber](https://docs.ag-ui.com/sdk/js/client/subscriber.md): Event-driven subscriber system for agent lifecycle and event handling
+- [Events](https://docs.ag-ui.com/sdk/js/core/events.md): Documentation for the events used in the Agent User Interaction Protocol SDK
+- [Overview](https://docs.ag-ui.com/sdk/js/core/overview.md): Core concepts in the Agent User Interaction Protocol SDK
+- [Types](https://docs.ag-ui.com/sdk/js/core/types.md): Documentation for the core types used in the Agent User Interaction Protocol SDK
+- [@ag-ui/encoder](https://docs.ag-ui.com/sdk/js/encoder.md)
+- [@ag-ui/proto](https://docs.ag-ui.com/sdk/js/proto.md)
+- [Events](https://docs.ag-ui.com/sdk/python/core/events.md): Documentation for the events used in the Agent User Interaction Protocol Python SDK
+- [Overview](https://docs.ag-ui.com/sdk/python/core/overview.md): Core concepts in the Agent User Interaction Protocol SDK
+- [Types](https://docs.ag-ui.com/sdk/python/core/types.md): Documentation for the core types used in the Agent User Interaction Protocol Python SDK
+- [Overview](https://docs.ag-ui.com/sdk/python/encoder/overview.md): Documentation for encoding Agent User Interaction Protocol events
+- [Developing with Cursor](https://docs.ag-ui.com/tutorials/cursor.md): Use Cursor to build AG-UI implementations faster
+- [Debugging](https://docs.ag-ui.com/tutorials/debugging.md): A comprehensive guide to debugging Agent User Interaction Protocol (AG-UI) integrations
+
+
+## Optional
+
+- [TypeScript SDK](https://docs.ag-ui.com/sdk/js/core/overview)
+- [Python SDK](https://docs.ag-ui.com/sdk/python/core/overview)

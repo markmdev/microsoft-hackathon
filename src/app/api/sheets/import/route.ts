@@ -3,9 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sheet_id, sheet_name } = body;
+    const {
+      sheetId,
+      sheet_id,
+      sheetName,
+      sheet_name,
+      visibleCaseLimit,
+      triagePreferences,
+    } = body;
 
-    if (!sheet_id) {
+    const effectiveSheetId = sheetId ?? sheet_id;
+    const effectiveSheetName = sheetName ?? sheet_name;
+
+    if (!effectiveSheetId) {
       return NextResponse.json(
         { error: "Sheet ID is required" },
         { status: 400 }
@@ -20,8 +30,10 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        sheet_id: sheet_id,
-        sheet_name: sheet_name,
+        sheet_id: effectiveSheetId,
+        sheet_name: effectiveSheetName,
+        visible_case_limit: visibleCaseLimit ?? 4,
+        triage_preferences: triagePreferences,
       }),
     });
 
