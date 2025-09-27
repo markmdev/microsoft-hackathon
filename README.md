@@ -50,9 +50,9 @@ Configure secrets in `agent/.env` (copy from `agent/.env.example`) and optional 
    resolution, injury_reported, property_damage,
    fault_determination, incident_description
    ```
-2. Launch the app and open the **Google Sheets Connection** card.
-3. Paste the sheet ID (from the Sheets URL) and optional tab name, then click **Import cases**.
-4. The first N cases (default 4) populate instantly; the rest stream into the live feed every 5 seconds.
+2. Launch the app — the dashboard automatically connects to the preconfigured sheet (`1Dam-5BADE3dYCib1uFdhSNJ8aGkUMJCOEwYCQifsfbk`).
+3. The first six rows render instantly; the remaining rows stream into the live feed every few seconds to simulate real-time ingestion.
+4. Update the Google Sheet and press **Save** in the triage panel (or refresh) to re-sync with the new data.
 
 ## Triage Preferences & Alerts
 - Update categories or jurisdictions to monitor from the **Triage Preferences** form. Preferences persist on the backend (`/profile/triage`).
@@ -61,7 +61,7 @@ Configure secrets in `agent/.env` (copy from `agent/.env.example`) and optional 
 - Matching incidents appear in the **Triage Alerts** panel; dismissing hides them client-side while the backend keeps historical matches for re-imports.
 
 ## Copilot Chat
-`<CopilotChat />` (from CopilotKit) is embedded at the bottom of the dashboard. It uses the shared `DashboardState` and LlamaIndex agent instructions defined in `agent/agent/agent.py`. Use it to:
+`<CopilotChat />` (from CopilotKit) stays pinned on the right rail. It uses the shared `DashboardState` and LlamaIndex agent instructions defined in `agent/agent/agent.py`. Use it to:
 - Summarize newest incidents (the model reads `cases` + `queuedCases`)
 - Ask for follow-up tasks or email drafts (Resend integration stub)
 - Confirm triage configuration and next steps
