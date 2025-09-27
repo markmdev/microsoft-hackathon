@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useCoAgent } from "@copilotkit/react-core";
-import { CopilotSidebar } from "@copilotkit/react-ui";
+import { CopilotChat } from "@copilotkit/react-ui";
 
 import { CaseDetailPanel } from "@/components/dashboard/CaseDetailPanel";
 import { CaseFeed } from "@/components/dashboard/CaseFeed";
@@ -93,7 +93,7 @@ export default function LawyerDashboardPage() {
           sheetId,
           sheetName,
           triagePreferences: viewState.profile.triagePreferences,
-          visibleCaseLimit: Math.max(viewState.liveFeed.nextCaseIndex, 4),
+          visibleCaseLimit: Math.max(viewState.liveFeed.nextCaseIndex, 97),
         });
 
         setState((previous) => {
@@ -271,13 +271,18 @@ export default function LawyerDashboardPage() {
       {/* 3-Column Layout: Chat | Main Content | Case Details */}
       <div className="flex h-screen">
         {/* Left Column: Chat */}
-        <div className="w-80 border-r border-border bg-white/80 backdrop-blur-sm overflow-hidden">
-          <CopilotSidebar
-            defaultOpen
-            className="w-full h-full border-none shadow-none"
-            instructions="Browse synced police reports, triage new matters, and request follow-up actions."
-          />
-        </div>
+        <aside className="w-80 flex flex-col p-4 pl-4 pr-0 border-r border-border bg-white/80 backdrop-blur-sm">
+          <div className="h-full flex flex-col w-full shadow-lg rounded-2xl border border-border overflow-hidden">
+            <CopilotChat
+              className="flex-1 overflow-auto w-full"
+              instructions="Browse synced police reports, triage new matters, and request follow-up actions."
+              labels={{
+                title: "Legal Ops Assistant",
+                initial: "👋 Browse synced police reports, triage new matters, and request follow-up actions.",
+              }}
+            />
+          </div>
+        </aside>
 
         {/* Main Column: Primary Content */}
         <div className="flex-1 flex flex-col gap-6 px-8 py-6 overflow-auto">

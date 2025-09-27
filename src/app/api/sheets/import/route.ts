@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         sheet_id: effectiveSheetId,
         sheet_name: effectiveSheetName,
-        visible_case_limit: visibleCaseLimit ?? 4,
+        visible_case_limit: visibleCaseLimit ?? 97,
         triage_preferences: triagePreferences,
       }),
     });

@@ -38,7 +38,7 @@ export async function importCases(payload: ImportCasesPayload): Promise<ImportCa
     body: JSON.stringify({
       sheetId: payload.sheetId,
       sheetName: payload.sheetName,
-      visibleCaseLimit: payload.visibleCaseLimit ?? 4,
+      visibleCaseLimit: payload.visibleCaseLimit ?? 97,
       triagePreferences: payload.triagePreferences,
     }),
   });
