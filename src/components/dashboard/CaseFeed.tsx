@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
+import { Button } from "@/components/ui/button";
 import type { CaseRecord } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
 
@@ -9,12 +10,27 @@ interface CaseFeedProps {
   queuedCount: number;
   activeCaseId?: string;
   onSelectCase: (incidentId: string) => void;
+  filterSummary?: string;
+  filteredCount?: number;
+  totalCount?: number;
+  isFiltered?: boolean;
+  onClearFilter?: () => void;
 }
 
 const baseListItemStyles =
   "flex cursor-pointer items-center gap-4 rounded-lg border border-border bg-gradient-to-r from-white via-white to-slate-50/50 p-4 transition-all duration-200 hover:from-blue-50/50 hover:to-purple-50/50 hover:shadow-md";
 
-export function CaseFeed({ cases, queuedCount, activeCaseId, onSelectCase }: CaseFeedProps) {
+export function CaseFeed({
+  cases,
+  queuedCount,
+  activeCaseId,
+  onSelectCase,
+  filterSummary,
+  filteredCount,
+  totalCount,
+  isFiltered,
+  onClearFilter,
+}: CaseFeedProps) {
   return (
     <section className="flex flex-1 flex-col gap-3">
       <header className="flex items-center justify-between">
@@ -28,6 +44,22 @@ export function CaseFeed({ cases, queuedCount, activeCaseId, onSelectCase }: Cas
           {queuedCount > 0 ? `${queuedCount} more incoming` : "Live feed active"}
         </div>
       </header>
+
+      {filterSummary && (
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-dashed border-indigo-200 bg-indigo-50 px-4 py-2 text-xs text-indigo-700">
+          <div className="flex flex-col">
+            <span className="font-medium">Filter active</span>
+            <span className="text-indigo-600/80">
+              {`Showing ${filteredCount ?? cases.length} of ${totalCount ?? cases.length} incidents • ${filterSummary}`}
+            </span>
+          </div>
+          {onClearFilter && (
+            <Button variant="ghost" size="sm" onClick={onClearFilter}>
+              Clear
+            </Button>
+          )}
+        </div>
+      )}
 
       <div className="h-[600px] overflow-y-auto space-y-3">
         <AnimatePresence mode="popLayout">
@@ -88,7 +120,9 @@ export function CaseFeed({ cases, queuedCount, activeCaseId, onSelectCase }: Cas
         </AnimatePresence>
         {cases.length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            Import a Google Sheet to populate the live feed.
+            {isFiltered
+              ? "No incidents match the current filter. Try adjusting or clearing the filter to see more cases."
+              : "Import a Google Sheet to populate the live feed."}
           </div>
         )}
       </div>
