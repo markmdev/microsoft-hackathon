@@ -4780,7 +4780,7 @@ Follow the [Slack webhook documentation](https://api.slack.com/messaging/webhook
 1. Create a Slack app (if you don't have one already)
 2. Enable incoming webhooks in your app settings
 3. Create an incoming webhook for your desired channel
-4. Copy the webhook URL (it will look like `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`)
+
 
 ### Step 2: Create a serverless function
 
